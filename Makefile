@@ -112,7 +112,7 @@ restore: ## Load a dump into the live database: make restore from=ruma-backup.sq
 	@echo "restored $(from) — run 'make migrate' if the code has newer migrations"
 
 realtime: ## Start the stack plus the Reverb chat server (needs REVERB_* keys + rebuild)
-	$(COMPOSE) --profile realtime up -d
+	$(COMPOSE) --profile realtime up -d --build
 
 ## Host (Herd, PHP 8.4)
 

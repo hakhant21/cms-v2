@@ -190,7 +190,7 @@ case "${1:-help}" in
         compose up -d app
         echo "restored $src — run './run.sh migrate' if the code has newer migrations"
         ;;
-    realtime)  ensure_env; compose --profile realtime up -d ;;
+    realtime)  ensure_env; compose --profile realtime up -d --build ;;
 
     test)      php artisan test --compact ;;
     pint)      ./vendor/bin/pint --dirty --format agent ;;
