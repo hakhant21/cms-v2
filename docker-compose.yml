@@ -100,6 +100,15 @@ services:
       context: .
       dockerfile: Dockerfile
       target: web
+      # Must match the app service's args exactly: Vite bakes these into the
+      # assets, and if the two images compile the echo entry with different
+      # values they get different hashes. The app would then render a URL from
+      # its manifest that the web image never built (404 on echo-*.js).
+      args:
+        VITE_REVERB_APP_KEY: ${REVERB_APP_KEY:-}
+        VITE_REVERB_HOST: ${REVERB_HOST:-localhost}
+        VITE_REVERB_PORT: ${REVERB_PORT:-8333}
+        VITE_REVERB_SCHEME: ${REVERB_SCHEME:-http}
     image: ruma-v2-web:${IMAGE_TAG:-latest}
     restart: unless-stopped
     depends_on:
