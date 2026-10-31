@@ -220,6 +220,9 @@ return [
         'map_title' => 'Ruma Organic location map',
         'success_message' => 'Your message has been sent successfully!',
         'office' => 'Our Office',
+        'offices_title' => 'Our Offices',
+        'intro' => 'Feel free to contact us. You can also reach us by phone or email.',
+        'tax_id' => 'Tax ID',
     ],
     'test_results' => [
         'title' => 'Test Result',
@@ -237,6 +240,8 @@ return [
         'title' => 'Our Next Projects',
         'subtitle' => 'Strategic innovations developed with Russian and Myanmar collaboration to improve yield, soil health, and sustainability.',
         'eyebrow' => 'Future Roadmap',
+        'highlights' => 'Project Highlights',
+        'more_title' => 'More Next Projects',
         'no_projects' => 'No projects available yet.',
         'collaborate_title' => 'Want to Partner on Future Agricultural Innovation?',
         'collaborate_subtitle' => 'Contact Ruma Organic to discuss trials, dealership, and farmer collaboration opportunities.',

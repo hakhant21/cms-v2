@@ -248,4 +248,55 @@ class ContentRenderingTest extends TestCase
         $this->assertStringContainsString('reports/2026.png', $trigger[0]);
         $this->assertStringContainsString('Laboratory report', $html);
     }
+
+    public function test_the_contact_offices_are_entered_once_and_shown_in_every_language(): void
+    {
+        Language::query()->create(['code' => 'my', 'name' => 'Myanmar', 'sort_order' => 2]);
+        Language::forgetCache();
+
+        // One office, stored once. The labels are not part of the data.
+        Setting::put('company.offices', [
+            [
+                'name' => 'RUMA Organic Myanmar',
+                'address' => 'No.(4132), Pyinmana Township, Nay Pyi Taw',
+                'tax_id' => '139546237',
+                'email' => 'info@rumaorg.com',
+                'phone' => '+959777538777',
+            ],
+        ], 'company');
+        Setting::forgetCache();
+
+        $page = Page::query()->create([
+            'kind' => Page::KIND_PAGE,
+            'slug' => 'contact',
+            'status' => Page::STATUS_PUBLISHED,
+            'published_at' => now(),
+        ]);
+
+        foreach (['en', 'my'] as $locale) {
+            $page->translations()->create([
+                'locale' => $locale,
+                'title' => 'Contact',
+                'content_blocks' => [['type' => 'contact_details', 'data' => ['title' => null]]],
+            ]);
+        }
+
+        // The same address, tax id and email reach both languages...
+        $this->get('/contact')
+            ->assertOk()
+            ->assertSee('RUMA Organic Myanmar')
+            ->assertSee('No.(4132), Pyinmana Township, Nay Pyi Taw')
+            ->assertSee('139546237')
+            ->assertSee('mailto:info@rumaorg.com', false)
+            ->assertSee('Tax ID');
+
+        // ...while the labels around them are translated, not re-entered.
+        $this->get('/my/contact')
+            ->assertOk()
+            ->assertSee('RUMA Organic Myanmar')
+            ->assertSee('No.(4132), Pyinmana Township, Nay Pyi Taw')
+            ->assertSee('139546237')
+            ->assertSee('အခွန်အမှတ်')
+            ->assertDontSee('Tax ID');
+    }
 }

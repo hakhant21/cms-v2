@@ -13,6 +13,27 @@
         ['banner', 'hero'],
         true,
     );
+
+    // A project is written as one plain rich-text block. Lifting that block
+    // into its own showcase means the featured image, the heading and the
+    // highlights share the first screen instead of collapsing into one card.
+    $projectIntro = null;
+
+    if ($kind === \App\Models\Page::KIND_PROJECT && ! $opensWithBanner && isset($blocks[0])) {
+        $first = $blocks[0];
+        $isPlainSection = ($first['type'] ?? null) === 'section'
+            && ($first['data']['layout'] ?? null) === 'plain';
+
+        if ($isPlainSection) {
+            foreach (($first['data']['fields'] ?? []) as $field) {
+                if (($field['type'] ?? null) === 'rich_text' && filled($field['value'] ?? null)) {
+                    $projectIntro = $first;
+
+                    break;
+                }
+            }
+        }
+    }
 @endphp
 
 @section('content')
@@ -71,7 +92,12 @@
             <x-site.product-media :page="$page" />
         @endif
 
-        @foreach ($blocks as $block)
+        @if ($projectIntro !== null)
+            <x-site.project-showcase :page="$page" :block="$projectIntro" />
+        @endif
+
+        @foreach ($blocks as $index => $block)
+            @continue($projectIntro !== null && $index === 0)
             <x-site.block :block="$block" />
         @endforeach
     @endif

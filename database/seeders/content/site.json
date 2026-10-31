@@ -4212,18 +4212,6 @@
                         {
                             "type": "section",
                             "data": {
-                                "layout": "plain",
-                                "fields": [
-                                    {
-                                        "type": "rich_text",
-                                        "value": "ကျွန်ုပ်တို့ထံ ဆက်သွယ်ရန် မပူပန်ပါနဲ့ဖုန်းသို့မဟုတ် အီးမေးလ် ဖြင့်လည်း ကျွန်ုပ်တို့အား ဆက်သွယ်နိုင်ပါသည်။RUMA Organic MyanmarAddress:No.(4132), Block No.(32)/ Paung Long – 2, Yarza Htarni Road, Bawga Wadi Ward, Pyinmana Township, Nay Pyi Taw, MyanmarTax ID: 139546237Email: info@rumaorg.comPhone: +959777538777, 09781267752RUMA ORGANIC CO.,LTD ThailandAddress:509/780 Moo 12 Nongprue, Banglamung, Chonburi, 20150Tax ID: 0205567052306Email: Sales@rumathai.comPhone: 0921077773"
-                                    }
-                                ]
-                            }
-                        },
-                        {
-                            "type": "section",
-                            "data": {
                                 "layout": "hero",
                                 "fields": [
                                     {
@@ -4273,18 +4261,6 @@
                     "excerpt": null,
                     "seo": null,
                     "blocks": [
-                        {
-                            "type": "section",
-                            "data": {
-                                "layout": "plain",
-                                "fields": [
-                                    {
-                                        "type": "rich_text",
-                                        "value": "Пожалуйста, не стесняйтесь связаться с намиВы также можете связаться с нами по телефону или электронной почте​RUMA Organic MyanmarНаш офис:No.(4132), Block No.(32)/ Paung Long – 2, Yarza Htarni Road, Bawga Wadi Ward, Pyinma Township, Nay Pyi Taw, MyanmarNo.1603, Time city office tower 3, Kyun Taw Road, Kamaryut Township, YangonTax ID: 139546237Наш электронныйадрес: rumaorganic@rumaorg.comНаш номер: +959777538777RUMA ORGANIC CO.,LTD ThailandНаш офис:509/780 Moo 12 Nongprue, Banglamung, Chonburi, 20150Tax ID: 0205567052306Наш электронный адрес: Sales@rumathai.comНаш номер: 0921077773"
-                                    }
-                                ]
-                            }
-                        },
                         {
                             "type": "section",
                             "data": {

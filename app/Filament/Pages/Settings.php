@@ -7,6 +7,7 @@ use App\Support\SiteSettings;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Forms\Components\ColorPicker;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -119,6 +120,23 @@ class Settings extends Page
             SiteSettings::TYPE_SELECT => Select::make($name)
                 ->label($field['label'])
                 ->options($field['options'] ?? []),
+            SiteSettings::TYPE_OFFICES => Repeater::make($name)
+                ->label($field['label'])
+                ->helperText($help)
+                ->schema([
+                    TextInput::make('name')->label('Office name')->required()->columnSpanFull(),
+                    Textarea::make('address')->label('Address')->rows(2)->required()->columnSpanFull(),
+                    TextInput::make('tax_id')->label('Tax ID'),
+                    TextInput::make('email')->label('Email'),
+                    TextInput::make('phone')->label('Phone')->columnSpanFull(),
+                ])
+                ->columns(2)
+                ->columnSpanFull()
+                ->reorderable()
+                ->collapsible()
+                ->defaultItems(0)
+                ->addActionLabel('Add an office')
+                ->itemLabel(fn (array $state): ?string => $state['name'] ?? null),
             default => TextInput::make($name)->label($field['label'])->helperText($help),
         };
     }
@@ -138,13 +156,28 @@ class Settings extends Page
         $data = $this->form->getState();
 
         foreach (SiteSettings::fields() as $key => $field) {
-            $isBool = $field['type'] === SiteSettings::TYPE_BOOL;
+            $value = $data[SiteSettings::fieldName($key)] ?? null;
+
+            $type = match ($field['type']) {
+                SiteSettings::TYPE_BOOL => Setting::TYPE_BOOL,
+                SiteSettings::TYPE_OFFICES => Setting::TYPE_JSON,
+                default => Setting::TYPE_STRING,
+            };
+
+            // The repeater keys its rows by uuid; store a clean list of offices
+            // and drop any half-filled row so the frontend never renders blanks.
+            if ($field['type'] === SiteSettings::TYPE_OFFICES) {
+                $value = array_values(array_filter(
+                    is_array($value) ? $value : [],
+                    fn (mixed $office): bool => is_array($office) && filled($office['name'] ?? null),
+                ));
+            }
 
             Setting::put(
                 $key,
-                $data[SiteSettings::fieldName($key)] ?? null,
+                $value,
                 SiteSettings::categoryOf($key),
-                $isBool ? Setting::TYPE_BOOL : Setting::TYPE_STRING,
+                $type,
             );
         }
 

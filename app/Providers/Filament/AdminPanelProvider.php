@@ -33,6 +33,9 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            // Background jobs (e.g. page translation) report back through the
+            // notifications bell, so the editor sees results without polling.
+            ->databaseNotifications()
             ->brandName(fn (): string => (string) Setting::get('company.name', config('app.name')))
             ->colors([
                 'primary' => Color::Emerald,

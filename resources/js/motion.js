@@ -409,8 +409,9 @@ function initSlider() {
  * road by itself — pausing at each year in turn, then riding on. The tour sets
  * off with the page rather than waiting to be scrolled into sight, so the
  * tractor is already on the road by the time the visitor reaches the section.
- * Hovering it, tabbing into it or switching the animations off holds it parked,
- * and pressing a card drives straight to that year.
+ * The drive is ambient: resting the mouse on the section no longer parks it,
+ * so it keeps looping while the page is read. Tabbing into it or switching the
+ * animations off still holds it parked, and pressing a card drives to that year.
  */
 function initFarmJourney() {
     document.querySelectorAll('[data-journey]').forEach((journey) => {
@@ -781,8 +782,10 @@ function initFarmJourney() {
             start();
         };
 
-        journey.addEventListener('mouseenter', hold);
-        journey.addEventListener('mouseleave', release);
+        // The mouse is deliberately not wired to hold/release: hovering the
+        // section used to park the tractor, which read as "the animation
+        // stopped" whenever a visitor rested their pointer on it to read a
+        // year. Keyboard focus still pauses the tour for accessibility.
         journey.addEventListener('focusin', hold);
         journey.addEventListener('focusout', release);
 

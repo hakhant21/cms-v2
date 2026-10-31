@@ -30,6 +30,25 @@ class SettingSeeder extends Seeder
                 // left for someone to discover.
                 'company.map_place_id' => '0x30c8b9001d3e3443:0x7e68357b00be8b21',
                 'company.map_query' => 'No.4132, Yazahtarni Road, Bawgawaddy Ward, Pyinmana Tsp, Nay Pyi Taw',
+                // Every office, entered once. The contact page renders these in
+                // all languages with translated labels, so an address change is
+                // a single edit in Settings rather than one per language.
+                'company.offices' => [
+                    [
+                        'name' => 'RUMA Organic Myanmar',
+                        'address' => 'No.(4132), Block No.(32)/ Paung Long – 2, Yarza Htarni Road, Bawga Wadi Ward, Pyinmana Township, Nay Pyi Taw, Myanmar',
+                        'tax_id' => '139546237',
+                        'email' => 'info@rumaorg.com',
+                        'phone' => '+959777538777, 09781267752',
+                    ],
+                    [
+                        'name' => 'RUMA ORGANIC CO.,LTD Thailand',
+                        'address' => '509/780 Moo 12 Nongprue, Banglamung, Chonburi, 20150',
+                        'tax_id' => '0205567052306',
+                        'email' => 'Sales@rumathai.com',
+                        'phone' => '0921077773',
+                    ],
+                ],
             ],
             'chat' => [
                 // On from the first install, because a bubble with nobody behind

@@ -34,6 +34,19 @@ if (! function_exists('setting_bool')) {
     }
 }
 
+if (! function_exists('setting_json')) {
+    /**
+     * A structured setting (e.g. the office list) as an array.
+     *
+     * @param  array<string, mixed>  $default
+     * @return array<string, mixed>
+     */
+    function setting_json(string $key, array $default = []): array
+    {
+        return Setting::json($key, $default);
+    }
+}
+
 if (! function_exists('media_url')) {
     /**
      * Public URL for a stored media path. Absolute URLs and root paths are

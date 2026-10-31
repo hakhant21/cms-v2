@@ -219,7 +219,7 @@ class TranslationTest extends TestCase
         (new GeminiTranslator)->translate(['one', 'two'], 'en', 'my');
     }
 
-    public function test_the_translate_action_fills_the_other_language_tabs(): void
+    public function test_the_translate_action_queues_a_job_that_writes_the_other_languages(): void
     {
         $page = Page::query()->create([
             'kind' => Page::KIND_PAGE,
@@ -238,7 +238,11 @@ class TranslationTest extends TestCase
 
         $this->app->instance(Translator::class, $this->fakeTranslator());
 
-        Livewire::actingAs(User::factory()->admin()->create())
+        $editor = User::factory()->admin()->create();
+
+        // The queue runs synchronously in tests, so the dispatched job lands
+        // here: it reads the saved source, writes the target row and notifies.
+        Livewire::actingAs($editor)
             ->test(EditPage::class, ['record' => $page->getRouteKey()])
             ->callAction('translate', [
                 'from' => 'en',
@@ -246,25 +250,91 @@ class TranslationTest extends TestCase
                 'overwrite' => false,
             ])
             ->assertHasNoActionErrors()
-            ->assertSet('data.translations.my.title', '[my] About us')
-            // The builder re-keys rows (and the fields inside them) by uuid,
-            // so the blocks are read as a list and the title field is found by
-            // its type rather than by position.
-            ->assertSet('data.translations.my.content_blocks', function (mixed $blocks): bool {
-                $block = is_array($blocks) ? (array_values($blocks)[0] ?? []) : [];
-                $fields = is_array($block['data']['fields'] ?? null) ? $block['data']['fields'] : [];
-                $title = null;
+            ->assertNotified();
 
-                foreach ($fields as $field) {
-                    if (($field['type'] ?? null) === 'title') {
-                        $title = $field['value'] ?? null;
-                    }
-                }
+        $my = PageTranslation::query()
+            ->where('page_id', $page->getKey())
+            ->where('locale', 'my')
+            ->first();
 
-                return ($block['type'] ?? null) === 'section'
-                    && ($block['data']['layout'] ?? null) === 'split'
-                    && $title === '[my] Our story';
-            });
+        $this->assertNotNull($my, 'The job should write the target language row.');
+        $this->assertSame('[my] About us', $my->title);
+        $this->assertSame('[my] Who we are', $my->excerpt);
+
+        $block = $my->blocks()[0] ?? [];
+        $title = null;
+
+        foreach ($block['data']['fields'] ?? [] as $field) {
+            if (($field['type'] ?? null) === 'title') {
+                $title = $field['value'] ?? null;
+            }
+        }
+
+        $this->assertSame('section', $block['type'] ?? null);
+        $this->assertSame('split', $block['data']['layout'] ?? null);
+        $this->assertSame('[my] Our story', $title);
+
+        // The source language is left exactly as the editor saved it.
+        $this->assertSame(
+            'About us',
+            PageTranslation::query()->where('page_id', $page->getKey())->where('locale', 'en')->value('title'),
+        );
+
+        // The editor is told the work finished, not just that it was queued.
+        $this->assertDatabaseHas('notifications', [
+            'notifiable_id' => $editor->getKey(),
+            'notifiable_type' => User::class,
+        ]);
+        $this->assertStringContainsString('strings translated', $editor->refresh()->notifications->first()?->data['title'] ?? '');
+    }
+
+    public function test_translating_again_refreshes_wording_the_other_language_already_had(): void
+    {
+        // The Contact-page case: English was edited, but the other language
+        // still holds the old wording. One Translate (default settings) must
+        // bring it up to date — not leave it for a manual second edit.
+        $page = Page::query()->create([
+            'kind' => Page::KIND_PAGE,
+            'slug' => 'contact',
+            'status' => Page::STATUS_PUBLISHED,
+            'published_at' => now(),
+        ]);
+
+        PageTranslation::query()->create([
+            'page_id' => $page->getKey(),
+            'locale' => 'en',
+            'title' => 'Contact',
+            'content_blocks' => [['type' => 'section', 'data' => [
+                'layout' => 'hero',
+                'fields' => [['type' => 'title', 'value' => 'Updated heading']],
+            ]]],
+        ]);
+
+        PageTranslation::query()->create([
+            'page_id' => $page->getKey(),
+            'locale' => 'my',
+            'title' => 'Contact',
+            'content_blocks' => [['type' => 'section', 'data' => [
+                'layout' => 'hero',
+                'fields' => [['type' => 'title', 'value' => 'Old heading']],
+            ]]],
+        ]);
+
+        $this->app->instance(Translator::class, $this->fakeTranslator());
+
+        Livewire::actingAs(User::factory()->admin()->create())
+            ->test(EditPage::class, ['record' => $page->getRouteKey()])
+            ->callAction('translate', [
+                'from' => 'en',
+                'to' => ['my'],
+                // overwrite deliberately omitted: the action defaults to replacing.
+            ])
+            ->assertHasNoActionErrors();
+
+        $my = PageTranslation::query()->where('page_id', $page->getKey())->where('locale', 'my')->first();
+        $title = $my->blocks()[0]['data']['fields'][0]['value'] ?? null;
+
+        $this->assertSame('[my] Updated heading', $title);
     }
 
     public function test_the_translate_button_is_on_the_page_editor(): void

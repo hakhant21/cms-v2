@@ -23,6 +23,8 @@ final class SiteSettings
 
     public const TYPE_SELECT = 'select';
 
+    public const TYPE_OFFICES = 'offices';
+
     /**
      * @return array<string, array{label: string, description: string, fields: array<string, array{label: string, type: string, help?: string, options?: array<string, string>}>}>
      */
@@ -50,6 +52,11 @@ final class SiteSettings
                         'options' => ['12' => 'District', '14' => 'Neighbourhood', '16' => 'Street', '18' => 'Building'],
                     ],
                     'company.office_hours' => ['label' => 'Office hours', 'type' => self::TYPE_TEXT],
+                    'company.offices' => [
+                        'label' => 'Offices',
+                        'type' => self::TYPE_OFFICES,
+                        'help' => 'Every office, entered once. The contact page shows them in all languages — the labels translate themselves, so an address change is a single edit here.',
+                    ],
                 ],
             ],
             'contact' => [
@@ -169,6 +176,7 @@ final class SiteSettings
         foreach (self::fields() as $key => $field) {
             $values[$key] = match ($field['type']) {
                 self::TYPE_BOOL => Setting::bool($key, true),
+                self::TYPE_OFFICES => Setting::json($key),
                 default => Setting::get($key),
             };
         }

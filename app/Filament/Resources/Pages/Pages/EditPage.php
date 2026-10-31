@@ -4,11 +4,11 @@ namespace App\Filament\Resources\Pages\Pages;
 
 use App\Filament\Resources\Pages\PageResource;
 use App\Filament\Resources\Pages\Schemas\PageForm;
+use App\Jobs\TranslatePageJob;
 use App\Models\Language;
 use App\Models\Page;
 use App\Support\PageTranslations;
 use App\Support\Translation\PageTranslator;
-use App\Support\Translation\TranslationFailed;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
@@ -43,11 +43,12 @@ class EditPage extends EditRecord
     }
 
     /**
-     * Machine translation, filled into the tabs rather than saved.
+     * Machine translation, run on the queue rather than in the request.
      *
-     * The result lands in the form, not in the database: a machine translation
-     * becomes content only once an editor has read it. Every tab it touched is
-     * waiting for review, and nothing is published until the page is saved.
+     * A Gemini run can take minutes, so the editor is freed at once: a job
+     * reads the saved source language, writes the chosen targets straight into
+     * the page and notifies whoever asked. The translation is live content when
+     * it lands, so the notification points back at the page to read over it.
      */
     private function translateAction(): Action
     {
@@ -60,7 +61,7 @@ class EditPage extends EditRecord
             ->color('gray')
             ->visible(fn (): bool => count($languages) > 1)
             ->modalHeading('Translate this page')
-            ->modalDescription('The words are copied into the other language tabs. Read them before you save.')
+            ->modalDescription('Save your changes first. The languages you choose are re-translated from the saved source in the background, and you will be notified when they are ready — no need to edit each tab.')
             ->modalSubmitActionLabel('Translate')
             ->schema([
                 Select::make('from')
@@ -77,11 +78,12 @@ class EditPage extends EditRecord
                     ->required()
                     ->helperText('Everything except the language you are translating from.'),
                 Toggle::make('overwrite')
-                    ->label('Replace text that is already there')
-                    ->helperText('Off: only empty fields are filled, and your own wording is kept.'),
+                    ->label('Replace wording that is already there')
+                    ->default(true)
+                    ->helperText('On: the chosen languages are re-translated from the source, so an edit you made once reaches them too. Off: only empty fields are filled and existing wording is kept.'),
             ])
             ->action(function (array $data): void {
-                $this->translateTabs(
+                $this->queueTranslation(
                     (string) $data['from'],
                     array_map('strval', (array) $data['to']),
                     (bool) ($data['overwrite'] ?? false),
@@ -92,69 +94,47 @@ class EditPage extends EditRecord
     /**
      * @param  array<int, string>  $into
      */
-    private function translateTabs(string $from, array $into, bool $overwrite): void
+    private function queueTranslation(string $from, array $into, bool $overwrite): void
     {
         $into = array_values(array_diff($into, [$from]));
-        $state = is_array($this->data['translations'] ?? null) ? $this->data['translations'] : [];
-        $source = is_array($state[$from] ?? null) ? $state[$from] : [];
 
-        $translator = app(PageTranslator::class);
-
-        if ($translator->texts($source) === []) {
+        if ($into === []) {
             Notification::make()
                 ->warning()
-                ->title('Nothing to translate')
-                ->body('The tab you chose has no text in it yet.')
+                ->title('Choose a language to translate into')
+                ->body('Pick at least one language other than the one you are translating from.')
                 ->send();
 
             return;
         }
 
-        $translated = 0;
-        $failed = [];
+        // The job translates the saved page, so an empty source here means the
+        // editor has not written (or not yet saved) the language they chose.
+        $source = PageTranslations::state($this->record)[$from] ?? [];
 
-        foreach ($into as $locale) {
-            try {
-                $result = $translator->translatePage(
-                    $source,
-                    is_array($state[$locale] ?? null) ? $state[$locale] : [],
-                    $from,
-                    $locale,
-                    $overwrite,
-                );
-            } catch (TranslationFailed $exception) {
-                // A missing key or a refused request stops that language only;
-                // the ones already done stay in the form.
-                $failed[] = $exception->getMessage();
-
-                continue;
-            }
-
-            $state[$locale] = $result['state'];
-            $translated += $result['translated'];
-        }
-
-        if ($translated > 0) {
-            $this->data['translations'] = $state;
-            $this->form->fill($this->data);
-        }
-
-        if ($failed !== []) {
+        if (app(PageTranslator::class)->texts($source) === []) {
             Notification::make()
-                ->danger()
-                ->title('Some languages were not translated')
-                ->body(implode(' ', array_unique($failed)))
-                ->persistent()
+                ->warning()
+                ->title('Nothing to translate')
+                ->body('The '.$from.' tab has no saved text yet. Write it and press Save, then translate.')
                 ->send();
+
+            return;
         }
 
-        if ($translated > 0) {
-            Notification::make()
-                ->success()
-                ->title($translated.' strings translated')
-                ->body('Read the other language tabs, then press Save to keep them.')
-                ->send();
-        }
+        TranslatePageJob::dispatch(
+            $this->record->getKey(),
+            $from,
+            $into,
+            $overwrite,
+            (int) auth()->id(),
+        );
+
+        Notification::make()
+            ->success()
+            ->title('Translation queued')
+            ->body('It runs in the background. You will get a notification when the other languages are ready — reload the page to read them.')
+            ->send();
     }
 
     /** Fill each language tab from its own translation row. */

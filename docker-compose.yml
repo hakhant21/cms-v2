@@ -3,8 +3,9 @@
 #   web    nginx: TLS terminates in front of this (a host proxy, Cloudflare, or
 #          your load balancer). It serves public/ and the uploaded images and
 #          passes PHP to the app service over FastCGI.
-#   app    php-fpm under supervisord, together with the queue worker (contact
-#          form mail is queued, so this is not optional) and the scheduler.
+#   app    php-fpm under supervisord, together with Horizon (which supervises
+#          the queue workers — contact-form mail and translation runs are
+#          queued, so this is not optional) and the scheduler.
 #   mysql  the site's content: pages, translations, navigation, settings.
 #          One service with its own volume, so the database survives a rebuild
 #          and a dump is all a backup needs.
