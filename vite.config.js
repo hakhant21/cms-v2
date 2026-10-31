@@ -12,6 +12,7 @@ export default defineConfig({
                 // Its own entry, loaded only where the chat bubble is rendered:
                 // laravel-echo and pusher-js are most of the broadcast layer and
                 // a page without a chat has no business shipping them.
+                'resources/js/echo.js',
             ],
             refresh: true,
         }),
