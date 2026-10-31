@@ -36,10 +36,15 @@ return [
             'secret' => env('REVERB_APP_SECRET'),
             'app_id' => env('REVERB_APP_ID'),
             'options' => [
-                'host' => env('REVERB_HOST'),
-                'port' => env('REVERB_PORT', 443),
-                'scheme' => env('REVERB_SCHEME', 'https'),
-                'useTLS' => env('REVERB_SCHEME', 'https') === 'https',
+                // The publish address is the one PHP uses to POST events to
+                // Reverb. In the Docker stack that is the internal service
+                // (reverb:8080), while browsers still use REVERB_HOST/PORT
+                // through the nginx WebSocket proxy. Host runs fall back to
+                // the public values, which is what Herd needs.
+                'host' => env('REVERB_PUBLISH_HOST', env('REVERB_HOST')),
+                'port' => env('REVERB_PUBLISH_PORT', env('REVERB_PORT', 443)),
+                'scheme' => env('REVERB_PUBLISH_SCHEME', env('REVERB_SCHEME', 'https')),
+                'useTLS' => env('REVERB_PUBLISH_SCHEME', env('REVERB_SCHEME', 'https')) === 'https',
             ],
             'client_options' => [
                 // Guzzle client options: https://docs.guzzlephp.org/en/stable/request-options.html

@@ -79,9 +79,18 @@ x-php-environment: &x-php-environment
   REVERB_APP_ID: ${REVERB_APP_ID:-}
   REVERB_APP_KEY: ${REVERB_APP_KEY:-}
   REVERB_APP_SECRET: ${REVERB_APP_SECRET:-}
+  # Public values: what browsers (Echo) and Filament use to connect. With the
+  # nginx proxy below, REVERB_PORT should be the site's own port (80 over HTTP,
+  # 443 behind TLS), not 8333.
   REVERB_HOST: ${REVERB_HOST:-localhost}
   REVERB_PORT: ${REVERB_PORT:-8333}
   REVERB_SCHEME: ${REVERB_SCHEME:-http}
+  # Internal values: PHP publishes events to the reverb container over the
+  # compose network. Keeping these separate from the public host/port means
+  # server-side broadcasting never has to hairpin through the public address.
+  REVERB_PUBLISH_HOST: reverb
+  REVERB_PUBLISH_PORT: "8080"
+  REVERB_PUBLISH_SCHEME: http
 
   LOG_CHANNEL: stderr
   LOG_LEVEL: ${LOG_LEVEL:-warning}
@@ -283,8 +292,11 @@ services:
       MIGRATE_AT_BOOT: "false"
       SUPERVISOR_QUEUE_AUTOSTART: "false"
       SUPERVISOR_SCHEDULER_AUTOSTART: "false"
-    ports:
-      - "${REVERB_PORT:-8333}:8080"
+    # Not published: nginx proxies /app/ to this container over the compose
+    # network, so browsers reach it on the site's own port. REVERB_PORT is now
+    # only the address clients are told to use.
+    expose:
+      - "8080"
     mem_limit: 192m
     memswap_limit: 256m
     logging: *x-logging
