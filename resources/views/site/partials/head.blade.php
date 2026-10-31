@@ -63,7 +63,6 @@
     {{-- Echo is a separate entry, pulled in only by a site that really offers a
          chat: the broadcast client is most of the site's JavaScript and pages
          without a bubble have no business shipping it. --}}
-    @vite('resources/js/echo.js')
 @endif
 
 @if ($themeStyle)
