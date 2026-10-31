@@ -8,6 +8,8 @@ use App\Support\SiteComposer;
 use App\Support\Translation\GeminiTranslator;
 use Filament\Support\Facades\FilamentView;
 use Filament\Tables\View\TablesRenderHook;
+use Filament\View\PanelsRenderHook;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
@@ -39,6 +41,19 @@ class AppServiceProvider extends ServiceProvider
         View::composer(
             ['layouts.site', 'pages.*'],
             SiteComposer::class,
+        );
+
+        // The admin chat thread listens on an `echo:` channel just like the
+        // public bubble. The panel does not include the public head, so the
+        // Echo entry has to be pulled in here — otherwise Livewire warns
+        // "Laravel Echo cannot be found" the moment a conversation is opened.
+        // The condition runs at render time (not boot) so it never touches the
+        // settings table while console commands are running.
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::HEAD_END,
+            fn (): string => \App\Support\Chat::enabled()
+                ? Blade::render("@vite('resources/js/echo.js')")
+                : '',
         );
 
         // Every admin table shows its choice filters as plain selects beside
