@@ -1,0 +1,153 @@
+/*
+  Motion layer.
+  ------------
+  The design system in app.css ships the layout and the long-running scene
+  animations (globe, tractor, orbs). This file adds the motion that has to be
+  driven by the document: scroll reveals, FAQ expansion, the sticky header and
+  the mobile menu.
+
+  Everything is progressive: `.js-motion` is only added once the script runs,
+  so without JavaScript every element stays visible instead of disappearing.
+*/
+
+html.js-motion [data-reveal] {
+    --reveal-duration: 760ms;
+    --reveal-delay: 0ms;
+    opacity: 0;
+    transform: translate3d(0, 1.9rem, 0) scale(0.985);
+    transition:
+        opacity var(--reveal-duration) cubic-bezier(0.16, 1, 0.3, 1)
+            var(--reveal-delay),
+        transform var(--reveal-duration) cubic-bezier(0.16, 1, 0.3, 1)
+            var(--reveal-delay);
+    will-change: opacity, transform;
+}
+
+html.js-motion [data-reveal='left'] {
+    transform: translate3d(-2.4rem, 0, 0);
+}
+
+html.js-motion [data-reveal='right'] {
+    transform: translate3d(2.4rem, 0, 0);
+}
+
+html.js-motion [data-reveal='zoom'] {
+    transform: scale(0.92);
+}
+
+html.js-motion [data-reveal='flip'] {
+    transform: perspective(1000px) rotateX(-9deg) translate3d(0, 2rem, 0);
+}
+
+html.js-motion [data-reveal].is-inview {
+    opacity: 1;
+    transform: none;
+}
+
+/* Stagger children of a revealed group without writing a delay per item. */
+html.js-motion [data-reveal-group] > * {
+    transition-delay: calc(var(--child-index, 0) * 70ms);
+}
+
+/* The sticky header lifts off the page once the visitor starts scrolling. */
+.site-header {
+    transition:
+        box-shadow 260ms ease,
+        padding 260ms ease,
+        background-color 260ms ease;
+}
+
+.site-header.is-scrolled {
+    box-shadow: 0 1.4rem 3rem rgba(12, 10, 9, 0.28);
+}
+
+/* Mobile navigation panel. */
+[data-mobile-nav] {
+    overflow: hidden;
+    animation: site-mobile-nav-in 280ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes site-mobile-nav-in {
+    from {
+        opacity: 0;
+        transform: translateY(-0.6rem);
+    }
+}
+
+/* Dropdowns fade in instead of snapping. */
+[data-dropdown-menu]:not(.hidden) {
+    animation: site-dropdown-in 180ms ease-out;
+}
+
+@keyframes site-dropdown-in {
+    from {
+        opacity: 0;
+        transform: translateY(-0.35rem);
+    }
+}
+
+/* Accordion: the panel animates from zero to its natural height. */
+.faq-panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 340ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.faq-panel > div {
+    overflow: hidden;
+}
+
+.faq-item.is-open .faq-panel {
+    grid-template-rows: 1fr;
+}
+
+.faq-item__icon {
+    transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.faq-item.is-open .faq-item__icon {
+    transform: rotate(45deg);
+}
+
+/* Numbers count up once they scroll into view; the script writes the value. */
+[data-count] {
+    font-variant-numeric: tabular-nums;
+}
+
+/* Scene helpers used by the animated section layouts. */
+.scene-fade {
+    transition:
+        opacity 500ms ease,
+        transform 500ms ease;
+}
+
+.farm-journey__stop {
+    transition:
+        opacity 320ms ease,
+        transform 320ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html.js-motion [data-reveal],
+    html.js-motion [data-reveal].is-inview {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+
+    [data-mobile-nav],
+    [data-dropdown-menu]:not(.hidden) {
+        animation: none;
+    }
+
+    .faq-panel {
+        transition: none;
+    }
+}
+
+.site-animation-none [data-reveal],
+.site-animation-none [data-reveal].is-inview {
+    opacity: 1;
+    transform: none;
+    transition: none;
+}

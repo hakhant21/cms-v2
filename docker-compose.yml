@@ -1,0 +1,277 @@
+# Ruma Organic v2 — the deployable stack.
+#
+#   web    nginx: TLS terminates in front of this (a host proxy, Cloudflare, or
+#          your load balancer). It serves public/ and the uploaded images and
+#          passes PHP to the app service over FastCGI.
+#   app    php-fpm under supervisord, together with the queue worker (contact
+#          form mail is queued, so this is not optional) and the scheduler.
+#   mysql  the site's content: pages, translations, navigation, settings.
+#          One service with its own volume, so the database survives a rebuild
+#          and a dump is all a backup needs.
+#   redis  sessions, cache and the queue — deliberately not the database, so
+#          page views, the queue worker and the admin never contend for it.
+#   reverb optional live-chat WebSocket server. Not started unless you ask:
+#          `docker compose --profile realtime up -d`. The chat degrades to a
+#          timer refresh without it, which is why BROADCAST_CONNECTION defaults
+#          to "log".
+#
+# Ports are published rather than bound to 80 because this file is used on
+# machines that already run Herd (80, 443, 8080 are theirs).
+#
+# First boot on an empty host: the mysql container creates the database and its
+# user from the values below, the entrypoint waits for it to accept connections,
+# then runs the migrations and the seeders (both idempotent — they only fill
+# gaps). Later boots never touch existing data.
+
+name: ruma-v2
+
+x-logging: &x-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+# Everything the php processes need, shared by `app` and the one-shot
+# `docker compose run` containers. `environment` wins over the host `.env` that
+# `env_file` loads, which is how one .env file serves Herd and Docker at once.
+x-php-environment: &x-php-environment
+  APP_ENV: ${APP_ENV:-production}
+  APP_DEBUG: ${APP_DEBUG:-false}
+  APP_URL: ${APP_URL:-http://localhost:8081}
+  APP_TIMEZONE: ${APP_TIMEZONE:-UTC}
+  APP_LOCALE: ${APP_LOCALE:-en}
+  APP_FAKER_LOCALE: ${APP_FAKER_LOCALE:-en_US}
+  APP_FALLBACK_LOCALE: ${APP_FALLBACK_LOCALE:-en}
+  APP_MAINTENANCE_DRIVER: file
+
+  # MySQL holds the content. DB_HOST is pinned rather than inherited: the host
+  # .env points at 127.0.0.1 for Herd, and inside this network the database lives
+  # under the service name. The credentials are shared with the `mysql` service
+  # below, which is what creates the database and this user on its first boot.
+  DB_CONNECTION: mysql
+  DB_HOST: mysql
+  DB_PORT: 3306
+  DB_DATABASE: ${DB_DATABASE:-ruma}
+  DB_USERNAME: ${DB_USERNAME:-ruma}
+  DB_PASSWORD: ${DB_PASSWORD:-ruma}
+  DB_CHARSET: ${DB_CHARSET:-utf8mb4}
+  DB_COLLATION: ${DB_COLLATION:-utf8mb4_unicode_ci}
+
+  # Redis keeps sessions, cache and jobs off the request path entirely: a page
+  # view writes a session row, and the queue worker polls for jobs, so both
+  # would otherwise be traffic on the content database.
+  SESSION_DRIVER: redis
+  # "default" is the redis connection config/database.php defines; sessions and
+  # the queue share it, cache gets its own (REDIS_CACHE_DB).
+  SESSION_CONNECTION: default
+  CACHE_STORE: redis
+  CACHE_PREFIX: ${CACHE_PREFIX:-}
+  QUEUE_CONNECTION: redis
+  REDIS_CLIENT: phpredis
+  REDIS_HOST: redis
+  REDIS_PORT: 6379
+  REDIS_DB: ${REDIS_DB:-0}
+  REDIS_CACHE_DB: ${REDIS_CACHE_DB:-1}
+  REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+
+  FILESYSTEM_DISK: public
+  BROADCAST_CONNECTION: ${BROADCAST_CONNECTION:-log}
+  REVERB_APP_ID: ${REVERB_APP_ID:-}
+  REVERB_APP_KEY: ${REVERB_APP_KEY:-}
+  REVERB_APP_SECRET: ${REVERB_APP_SECRET:-}
+  REVERB_HOST: ${REVERB_HOST:-localhost}
+  REVERB_PORT: ${REVERB_PORT:-8333}
+  REVERB_SCHEME: ${REVERB_SCHEME:-http}
+
+  LOG_CHANNEL: stderr
+  LOG_LEVEL: ${LOG_LEVEL:-warning}
+  MAIL_MAILER: ${MAIL_MAILER:-log}
+  MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS:-hello@example.com}
+  MAIL_FROM_NAME: ${APP_NAME:-Ruma Organic}
+
+  # The "Translate" button in the page editor. Empty key = button does nothing.
+  AI_TRANSLATION_PROVIDER: ${AI_TRANSLATION_PROVIDER:-gemini}
+  GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+  GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: web
+    image: ruma-v2-web:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    depends_on:
+      app:
+        condition: service_healthy
+    ports:
+      - "${WEB_PORT:-8081}:80"
+    volumes:
+      # Read-only: nginx never writes an upload, and a misconfigured PHP bug
+      # should not be able to rewrite the site's images.
+      - ruma-storage:/var/www/html/storage:ro
+    read_only: true
+    tmpfs:
+      - /var/cache/nginx
+      - /var/run
+      - /tmp
+    cap_drop:
+      - ALL
+    mem_limit: 64m
+    memswap_limit: 96m
+    logging: *x-logging
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1/up"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: app
+      args:
+        PHP_VERSION: ${PHP_VERSION:-8.4}
+        COMPOSER_VERSION: ${COMPOSER_VERSION:-2}
+        # Vite bakes these into the broadcast client, so changing them means a
+        # rebuild — `docker compose build app` before `up`.
+        VITE_REVERB_APP_KEY: ${REVERB_APP_KEY:-}
+        VITE_REVERB_HOST: ${REVERB_HOST:-localhost}
+        VITE_REVERB_PORT: ${REVERB_PORT:-8333}
+        VITE_REVERB_SCHEME: ${REVERB_SCHEME:-http}
+    image: ruma-v2-app:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    # APP_KEY and anything not listed under x-php-environment (MAIL_* credentials,
+    # REVERB_* secrets, ...) is read from the same .env the Herd setup uses.
+    env_file:
+      - .env
+    environment:
+      <<: *x-php-environment
+      # supervisord reads these two with %(ENV_...)s interpolation.
+      SUPERVISOR_QUEUE_AUTOSTART: ${QUEUE_AUTOSTART:-true}
+      SUPERVISOR_SCHEDULER_AUTOSTART: ${SCHEDULER_AUTOSTART:-true}
+    volumes:
+      - ruma-storage:/var/www/html/storage
+      - ruma-cache:/var/www/html/bootstrap/cache
+    expose:
+      - "9000"
+    mem_limit: 384m
+    memswap_limit: 512m
+    logging: *x-logging
+    healthcheck:
+      # No curl in a php-fpm image, and installing one for a single probe is
+      # silly: ask PHP to open the FastCGI port and exit non-zero if it cannot.
+      # $$ escapes compose interpolation, so $e/$s reach PHP intact.
+      test: ["CMD", "php", "-r", "exit(@stream_socket_client('tcp://127.0.0.1:9000',$$e,$$s,3)?0:1);"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+
+  # The content database — pages, translations, navigation, settings, media
+  # records. 8.4 is MySQL's long-term-support line.
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    # utf8mb4 throughout, so Burmese text survives every round trip, and
+    # unicode_ci rather than the 8.x default because that is the collation
+    # config/database.php asks for. The buffer pool is capped: this container
+    # holds a few hundred small pages, not an analytics warehouse.
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --innodb-buffer-pool-size=128M
+    environment:
+      # The image's own first boot creates MYSQL_DATABASE and grants MYSQL_USER
+      # access to exactly that database. Root never leaves the container; it is
+      # here for `make backup`, which dumps as root.
+      MYSQL_DATABASE: ${DB_DATABASE:-ruma}
+      MYSQL_USER: ${DB_USERNAME:-ruma}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-ruma}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-ruma-root}
+    volumes:
+      - ruma-mysql:/var/lib/mysql
+    # No published port: the app container is the only client and it arrives over
+    # this network. Add `ports: ["3306:3306"]` only when a host tool must reach
+    # the deployed database — an open 3306 is a standing invitation on a server.
+    mem_limit: 700m
+    memswap_limit: 900m
+    logging: *x-logging
+    healthcheck:
+      # `mysqladmin ping` answers while the image is still bootstrapping, and the
+      # app's migrations would then fail on a missing grant. So the probe connects
+      # as the application user over TCP, to the application database: the moment
+      # that succeeds, the site can work. $$ keeps compose out of the container's
+      # own environment values.
+      test: ["CMD-SHELL", "mysql -h 127.0.0.1 -u\"$$MYSQL_USER\" -p\"$$MYSQL_PASSWORD\" \"$$MYSQL_DATABASE\" -e 'SELECT 1' > /dev/null"]
+      interval: 15s
+      timeout: 5s
+      retries: 12
+      start_period: 40s
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    # noeviction would fail a cache write once memory is full, and allkeys-lru
+    # would happily evict a queued job. volatile-lru only drops keys that carry
+    # a TTL (cache entries, sessions) and leaves the queue lists alone.
+    command: >
+      redis-server
+      --maxmemory 96mb
+      --maxmemory-policy volatile-lru
+      --appendonly yes
+      --appendfsync everysec
+      --save ""
+    volumes:
+      - ruma-redis:/data
+    mem_limit: 160m
+    memswap_limit: 192m
+    logging: *x-logging
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 15s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+
+  # Live chat over WebSockets. Opt in with `--profile realtime`, and set the
+  # REVERB_* keys in .env (then rebuild, because the browser side is baked in).
+  reverb:
+    profiles: ["realtime"]
+    # Same image the app service builds; no second build to keep in sync.
+    image: ruma-v2-app:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    command: ["php", "artisan", "reverb:start", "--host=0.0.0.0", "--port=8080"]
+    depends_on:
+      app:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      <<: *x-php-environment
+      # One container owns the schema: the app service migrates, this one only
+      # reads the sessions and queue that live in Redis.
+      MIGRATE_AT_BOOT: "false"
+      SUPERVISOR_QUEUE_AUTOSTART: "false"
+      SUPERVISOR_SCHEDULER_AUTOSTART: "false"
+    ports:
+      - "${REVERB_PORT:-8333}:8080"
+    mem_limit: 192m
+    memswap_limit: 256m
+    logging: *x-logging
+
+volumes:
+  ruma-mysql:
+  ruma-storage:
+  ruma-cache:
+  ruma-redis:

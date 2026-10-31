@@ -1,0 +1,946 @@
+/*
+  Content components.
+  -------------------
+  Small, reusable classes for the blocks that are composed in the admin rather
+  than hand-built scenes: rich text, editorial cards, the FAQ accordion, the
+  contact tiles and the form controls. Layout stays in Tailwind utilities; only
+  what utilities cannot express (typographic rhythm, themed surfaces, hover
+  motion) lives here.
+*/
+
+@layer components {
+    /* Rich text written in the admin editor. Tailwind ships no typography
+       plugin in this project, so the rhythm is defined once, here. */
+    .rich-text {
+        color: color-mix(in srgb, var(--site-text) 86%, var(--site-surface));
+        font-size: 1rem;
+        line-height: 1.85;
+    }
+
+    .rich-text > * + * {
+        margin-top: 1rem;
+    }
+
+    .rich-text h1,
+    .rich-text h2,
+    .rich-text h3,
+    .rich-text h4 {
+        color: var(--site-text);
+        font-weight: 800;
+        letter-spacing: -0.015em;
+        line-height: 1.25;
+        margin-top: 1.9rem;
+    }
+
+    .rich-text h1 {
+        font-size: 1.9rem;
+    }
+
+    .rich-text h2 {
+        font-size: 1.5rem;
+    }
+
+    .rich-text h3 {
+        font-size: 1.2rem;
+    }
+
+    .rich-text h4 {
+        font-size: 1.05rem;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+    }
+
+    .rich-text strong {
+        color: var(--site-text);
+        font-weight: 700;
+    }
+
+    .rich-text a {
+        color: var(--site-primary);
+        font-weight: 600;
+        text-decoration: underline;
+        text-decoration-thickness: 1px;
+        text-underline-offset: 3px;
+    }
+
+    .rich-text a:hover {
+        color: var(--site-accent);
+    }
+
+    .rich-text ul,
+    .rich-text ol {
+        padding-left: 1.4rem;
+    }
+
+    .rich-text ul {
+        list-style: disc;
+    }
+
+    .rich-text ol {
+        list-style: decimal;
+    }
+
+    .rich-text li + li {
+        margin-top: 0.4rem;
+    }
+
+    .rich-text li::marker {
+        color: var(--site-primary);
+    }
+
+    .rich-text blockquote {
+        border-left: 3px solid var(--site-accent);
+        padding: 0.25rem 0 0.25rem 1.25rem;
+        color: color-mix(in srgb, var(--site-text) 70%, var(--site-surface));
+        font-style: italic;
+    }
+
+    .rich-text img {
+        border-radius: 1.5rem;
+        width: 100%;
+    }
+
+    .rich-text hr {
+        border-color: color-mix(in srgb, var(--site-text) 12%, var(--site-surface));
+        margin: 2rem 0;
+    }
+
+    .rich-text table {
+        border-collapse: collapse;
+        font-size: 0.95rem;
+        width: 100%;
+    }
+
+    .rich-text th,
+    .rich-text td {
+        border-bottom: 1px solid
+            color-mix(in srgb, var(--site-text) 10%, var(--site-surface));
+        padding: 0.6rem 0.75rem;
+        text-align: left;
+    }
+
+    .rich-text th {
+        color: var(--site-text);
+        font-weight: 700;
+    }
+
+    /* The one card every collection and grid block reuses. */
+    .content-card {
+        background-color: #fff;
+        border: 1px solid
+            color-mix(in srgb, var(--site-primary) 10%, #e7e5e4);
+        border-radius: 1.5rem;
+        box-shadow:
+            0 1px 2px rgba(12, 10, 9, 0.04),
+            0 22px 40px -34px rgba(12, 10, 9, 0.45);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        transition:
+            transform 420ms cubic-bezier(0.16, 1, 0.3, 1),
+            box-shadow 420ms cubic-bezier(0.16, 1, 0.3, 1),
+            border-color 420ms ease;
+    }
+
+    .content-card:hover {
+        border-color: color-mix(in srgb, var(--site-primary) 26%, #e7e5e4);
+        box-shadow:
+            0 2px 4px rgba(12, 10, 9, 0.05),
+            0 30px 50px -32px rgba(12, 10, 9, 0.5);
+        transform: translateY(-4px);
+    }
+
+    .content-card__index {
+        color: color-mix(in srgb, var(--site-primary) 55%, #fff);
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.22em;
+    }
+
+    /*
+     * Testimonial carousel.
+     *
+     * The track is a plain flex row; the script only changes `transform`, so the
+     * motion stays on the compositor and nothing reflows while cards slide. The
+     * number of cards per view is a CSS variable set by the block, and phones
+     * always show one — two 20rem cards do not fit in a 22rem screen.
+     */
+    .carousel-viewport {
+        overflow: hidden;
+        padding-block: 0.5rem;
+    }
+
+    .carousel-track {
+        display: flex;
+        gap: 1.5rem;
+        transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+        will-change: transform;
+    }
+
+    .carousel-slide {
+        flex: 0 0 calc(
+            (100% - (var(--carousel-per-view, 2) - 1) * 1.5rem) /
+                var(--carousel-per-view, 2)
+        );
+        min-width: 0;
+    }
+
+    @media (max-width: 767px) {
+        .carousel-slide {
+            flex-basis: 100%;
+        }
+    }
+
+    /* A visitor who asked for less motion still gets the controls, just no
+       sliding animation. */
+    .site-animation-none .carousel-track,
+    .site-animation-calm .carousel-track {
+        transition-duration: 320ms;
+    }
+
+    .carousel-arrow {
+        align-items: center;
+        background: #fff;
+        border: 1px solid color-mix(in srgb, var(--site-primary) 14%, #e7e5e4);
+        border-radius: 9999px;
+        color: var(--site-primary);
+        display: inline-flex;
+        height: 2.5rem;
+        justify-content: center;
+        transition:
+            background-color 250ms ease,
+            border-color 250ms ease,
+            color 250ms ease,
+            transform 250ms ease;
+        width: 2.5rem;
+    }
+
+    .carousel-arrow:hover {
+        background: var(--site-primary);
+        border-color: var(--site-primary);
+        color: #fff;
+        transform: translateY(-1px);
+    }
+
+    .carousel-dot {
+        background: color-mix(in srgb, var(--site-primary) 22%, #fff);
+        border-radius: 9999px;
+        height: 0.5rem;
+        transition:
+            background-color 250ms ease,
+            width 300ms cubic-bezier(0.22, 1, 0.36, 1);
+        width: 0.5rem;
+    }
+
+    .carousel-dot.is-active {
+        background: var(--site-primary);
+        width: 1.5rem;
+    }
+
+    /* The small pill used above titles and on card labels. */
+    .content-eyebrow {
+        align-items: center;
+        color: var(--site-primary);
+        display: inline-flex;
+        font-size: 0.7rem;
+        font-weight: 700;
+        gap: 0.5rem;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+    }
+
+    .content-eyebrow::before {
+        background: var(--site-accent);
+        content: '';
+        display: block;
+        height: 1px;
+        width: 1.75rem;
+    }
+
+    /* FAQ accordion. The height animation lives in motion.css. */
+    .faq-item {
+        background-color: #fff;
+        border: 1px solid
+            color-mix(in srgb, var(--site-primary) 10%, #e7e5e4);
+        border-radius: 1.25rem;
+        overflow: hidden;
+        transition:
+            border-color 300ms ease,
+            box-shadow 300ms ease;
+    }
+
+    .faq-item + .faq-item {
+        margin-top: 0.75rem;
+    }
+
+    .faq-item.is-open {
+        border-color: color-mix(in srgb, var(--site-primary) 30%, #e7e5e4);
+        box-shadow: 0 20px 40px -34px rgba(12, 10, 9, 0.4);
+    }
+
+    .faq-trigger {
+        align-items: center;
+        color: var(--site-text);
+        cursor: pointer;
+        display: flex;
+        font-size: 1rem;
+        font-weight: 650;
+        gap: 1rem;
+        justify-content: space-between;
+        padding: 1.15rem 1.4rem;
+        text-align: left;
+        width: 100%;
+    }
+
+    .faq-trigger:hover {
+        color: var(--site-primary);
+    }
+
+    .faq-item__icon {
+        align-items: center;
+        background: color-mix(in srgb, var(--site-primary) 8%, #fff);
+        border-radius: 999px;
+        color: var(--site-primary);
+        display: inline-flex;
+        flex: none;
+        height: 2rem;
+        justify-content: center;
+        width: 2rem;
+    }
+
+    .faq-item__icon svg {
+        transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .faq-item.is-open .faq-item__icon svg {
+        transform: rotate(45deg);
+    }
+
+    .faq-body {
+        padding: 0 1.4rem 1.35rem;
+    }
+
+    /* Comparison bars: the width is written inline, the reveal drives it. */
+    .yield-bar {
+        border-radius: 999px;
+        height: 100%;
+        transition: width 1100ms cubic-bezier(0.16, 1, 0.3, 1);
+        width: 0;
+    }
+
+    .is-inview .yield-bar,
+    html:not(.js-motion) .yield-bar {
+        width: var(--bar, 0%);
+    }
+
+    /* Contact tiles. */
+    .contact-tile {
+        align-items: flex-start;
+        background-color: #fff;
+        border: 1px solid
+            color-mix(in srgb, var(--site-primary) 10%, #e7e5e4);
+        border-radius: 1.25rem;
+        display: flex;
+        gap: 0.9rem;
+        padding: 1.15rem 1.25rem;
+    }
+
+    .contact-tile__icon {
+        align-items: center;
+        background: color-mix(in srgb, var(--site-primary) 10%, #fff);
+        border-radius: 0.9rem;
+        color: var(--site-primary);
+        display: inline-flex;
+        flex: none;
+        height: 2.5rem;
+        justify-content: center;
+        width: 2.5rem;
+    }
+
+    /* Form controls used by the contact island. */
+    .form-label {
+        color: var(--site-text);
+        display: block;
+        font-size: 0.8rem;
+        font-weight: 650;
+        letter-spacing: 0.02em;
+        margin-bottom: 0.4rem;
+    }
+
+    .form-input {
+        background-color: #fff;
+        border: 1px solid
+            color-mix(in srgb, var(--site-text) 16%, var(--site-surface));
+        border-radius: 0.85rem;
+        color: var(--site-text);
+        font-size: 0.95rem;
+        padding: 0.7rem 0.95rem;
+        transition:
+            border-color 200ms ease,
+            box-shadow 200ms ease;
+        width: 100%;
+    }
+
+    .form-input::placeholder {
+        color: color-mix(in srgb, var(--site-text) 45%, var(--site-surface));
+    }
+
+    .form-input:focus {
+        border-color: var(--site-primary);
+        box-shadow: 0 0 0 3px
+            color-mix(in srgb, var(--site-primary) 18%, transparent);
+        outline: none;
+    }
+
+    .form-error {
+        color: #b91c1c;
+        font-size: 0.78rem;
+        margin-top: 0.3rem;
+    }
+
+    /* The map frame in the contact block. */
+    .map-frame {
+        border-radius: 1.75rem;
+        box-shadow: 0 30px 60px -45px rgba(12, 10, 9, 0.6);
+        overflow: hidden;
+    }
+
+    .map-frame iframe {
+        border: 0;
+        display: block;
+        height: 100%;
+        width: 100%;
+    }
+}
+
+/* A calm or disabled motion profile turns the hover lifts off entirely. */
+.site-animation-none .content-card,
+.site-animation-none .content-card:hover {
+    transform: none;
+    transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .content-card,
+    .content-card:hover {
+        transform: none;
+        transition: none;
+    }
+}
+
+/*
+ * Image lightbox.
+ *
+ * One dialog per page, opened by any [data-lightbox] trigger. The image is
+ * letterboxed inside the viewport rather than scaled past it, so a scanned lab
+ * report stays readable, and the panel is a real dialog above the sticky
+ * header (which sits at z-index 50).
+ */
+.lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem;
+}
+
+.lightbox[hidden] {
+    display: none;
+}
+
+/* The page underneath holds still while the dialog is up. */
+body.has-lightbox {
+    overflow: hidden;
+}
+
+.lightbox__backdrop {
+    position: absolute;
+    inset: 0;
+    background: color-mix(in srgb, var(--site-ink) 88%, black);
+    backdrop-filter: blur(6px);
+    cursor: zoom-out;
+}
+
+.lightbox__panel {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    max-width: min(72rem, 100%);
+    margin: 0;
+    overflow: hidden;
+    border-radius: 1.25rem;
+    background: white;
+    box-shadow: 0 40px 80px -40px rgba(0, 0, 0, 0.75);
+}
+
+.lightbox__image {
+    display: block;
+    max-height: min(72vh, 46rem);
+    width: auto;
+    max-width: 100%;
+    margin: 0 auto;
+    object-fit: contain;
+    background: var(--site-surface);
+}
+
+.lightbox__bar {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-top: 1px solid color-mix(in srgb, var(--site-text) 10%, transparent);
+}
+
+.lightbox__counter {
+    color: color-mix(in srgb, var(--site-text) 45%, white);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    font-variant-numeric: tabular-nums;
+}
+
+.lightbox__caption {
+    margin: 0;
+    color: color-mix(in srgb, var(--site-text) 80%, white);
+    font-size: 0.85rem;
+    line-height: 1.5;
+}
+
+.lightbox__controls {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0 1rem 1rem;
+}
+
+.lightbox__nav {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.4rem;
+    height: 2.4rem;
+    border: 1px solid color-mix(in srgb, var(--site-text) 14%, transparent);
+    border-radius: 999px;
+    background: var(--site-surface);
+    color: var(--site-text);
+    cursor: pointer;
+    transition:
+        background-color 200ms ease,
+        border-color 200ms ease,
+        color 200ms ease,
+        transform 200ms ease;
+}
+
+.lightbox__nav:hover:not(:disabled) {
+    border-color: color-mix(in srgb, var(--site-accent) 70%, transparent);
+    background: color-mix(in srgb, var(--site-accent) 22%, white);
+    transform: translateY(-1px);
+}
+
+.lightbox__nav:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
+.lightbox__original {
+    width: auto;
+    padding-inline: 0.9rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+}
+
+.lightbox__close {
+    margin-inline-start: auto;
+}
+
+/* The dialog fades in and the panel settles; both are skipped when the visitor
+   asks for less motion. */
+html.js-motion .lightbox.is-open .lightbox__backdrop {
+    animation: lightbox-fade 220ms ease-out;
+}
+
+html.js-motion .lightbox.is-open .lightbox__panel {
+    animation: lightbox-pop 260ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes lightbox-fade {
+    from {
+        opacity: 0;
+    }
+}
+
+@keyframes lightbox-pop {
+    from {
+        opacity: 0;
+        transform: scale(0.94) translate3d(0, 1rem, 0);
+    }
+}
+
+@media (max-width: 640px) {
+    .lightbox {
+        padding: 0.75rem;
+    }
+
+    .lightbox__image {
+        max-height: 62vh;
+    }
+
+    .lightbox__original {
+        display: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html.js-motion .lightbox.is-open .lightbox__backdrop,
+    html.js-motion .lightbox.is-open .lightbox__panel {
+        animation: none;
+    }
+
+    .lightbox__nav:hover:not(:disabled) {
+        transform: none;
+    }
+}
+
+/* ==========================================================================
+   Live chat
+   --------------------------------------------------------------------------
+   The bubble sits in the bottom-right corner, above the header (50) and below
+   the image dialog (90). The log is a column-reverse box whose newest line is
+   first in the DOM, which is the whole trick behind keeping it pinned to the
+   bottom as replies arrive: the browser anchors the scroll to what is already
+   in view, so no script has to measure or scroll anything.
+   ========================================================================== */
+
+.chat {
+    position: fixed;
+    right: clamp(1rem, 3vw, 1.75rem);
+    bottom: clamp(1rem, 3vw, 1.75rem);
+    z-index: 60;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.75rem;
+}
+
+.chat__panel {
+    display: flex;
+    flex-direction: column;
+    width: min(23rem, calc(100vw - 2rem));
+    max-height: min(32rem, calc(100vh - 7rem));
+    overflow: hidden;
+    border: 1px solid var(--site-border);
+    border-radius: var(--site-radius);
+    background: #fff;
+    box-shadow: var(--site-shadow);
+}
+
+.chat__head {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.85rem 1rem;
+    background: var(--site-primary);
+    color: #fff;
+}
+
+.chat__title {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.chat__state {
+    margin: 0.15rem 0 0;
+    max-width: 17rem;
+    font-size: 0.72rem;
+    line-height: 1.5;
+    opacity: 0.85;
+}
+
+.chat__dismiss {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 2rem;
+    height: 2rem;
+    margin-inline-start: auto;
+    border: 0;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 16%);
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.chat__dismiss:hover {
+    background: rgb(255 255 255 / 32%);
+}
+
+.chat__log {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 0.65rem;
+    flex: 1 1 auto;
+    overscroll-behavior: contain;
+    overflow-y: auto;
+    padding: 0.9rem 1rem;
+    background: var(--site-surface);
+}
+
+.chat__empty {
+    margin: 0.5rem 0;
+    font-size: 0.78rem;
+    text-align: center;
+    color: color-mix(in srgb, var(--site-text) 50%, var(--site-surface));
+}
+
+.chat__row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    max-width: 85%;
+}
+
+.chat__row--visitor {
+    align-self: flex-end;
+    align-items: flex-end;
+}
+
+.chat__row--agent {
+    align-self: flex-start;
+}
+
+.chat__row--system {
+    align-self: center;
+    max-width: 100%;
+}
+
+.chat__bubble {
+    margin: 0;
+    padding: 0.55rem 0.8rem;
+    border-radius: 1rem 1rem 1rem 0.35rem;
+    background: #fff;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 8%);
+    color: var(--site-text);
+    font-size: 0.84rem;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+}
+
+.chat__row--visitor .chat__bubble {
+    border-radius: 1rem 1rem 0.35rem 1rem;
+    background: var(--site-primary);
+    box-shadow: none;
+    color: #fff;
+}
+
+.chat__row--system .chat__bubble {
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--site-accent) 55%, #fff);
+    box-shadow: none;
+    font-size: 0.74rem;
+    text-align: center;
+}
+
+.chat__meta {
+    margin: 0;
+    padding-inline: 0.35rem;
+    font-size: 0.64rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--site-text) 45%, var(--site-surface));
+}
+
+.chat__composer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    padding: 0.75rem 1rem 1rem;
+    border-top: 1px solid var(--site-border);
+    background: #fff;
+}
+
+.chat__identity {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+}
+
+.chat__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
+}
+
+.chat__label {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--site-text) 55%, var(--site-surface));
+}
+
+.chat__input,
+.chat__textarea {
+    width: 100%;
+    padding: 0.5rem 0.6rem;
+    border: 1px solid var(--site-border);
+    border-radius: 0.7rem;
+    background: var(--site-surface);
+    color: var(--site-text);
+    font: inherit;
+    font-size: 0.82rem;
+}
+
+.chat__textarea {
+    flex: 1 1 auto;
+    min-height: 3.2rem;
+    resize: vertical;
+}
+
+.chat__input:focus-visible,
+.chat__textarea:focus-visible {
+    outline: 2px solid var(--site-primary);
+    outline-offset: 1px;
+    background: #fff;
+}
+
+.chat__write {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.5rem;
+}
+
+.chat__send {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 0;
+    border-radius: 999px;
+    background: var(--site-primary);
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.chat__send:hover {
+    background: color-mix(in srgb, var(--site-primary) 85%, #000);
+    transform: translateY(-1px);
+}
+
+.chat__error {
+    margin: 0;
+    font-size: 0.72rem;
+    color: #b91c1c;
+}
+
+.chat__hint {
+    margin: 0;
+    font-size: 0.68rem;
+    color: color-mix(in srgb, var(--site-text) 42%, var(--site-surface));
+}
+
+.chat__bubble-button {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.7rem 1.05rem;
+    border: 0;
+    border-radius: 999px;
+    background: var(--site-primary);
+    box-shadow: 0 0.8rem 1.8rem -0.6rem rgb(0 0 0 / 45%);
+    color: #fff;
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 600;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.chat__bubble-button:hover {
+    background: color-mix(in srgb, var(--site-primary) 88%, #000);
+    transform: translateY(-2px);
+}
+
+.chat__bubble-button:focus-visible {
+    outline: 2px solid var(--site-accent);
+    outline-offset: 3px;
+}
+
+.chat__dot {
+    position: absolute;
+    top: 0.15rem;
+    right: 0.15rem;
+    width: 0.7rem;
+    height: 0.7rem;
+    border: 2px solid #fff;
+    border-radius: 999px;
+    background: var(--site-accent);
+}
+
+@keyframes chat-rise {
+    from {
+        opacity: 0;
+        transform: translateY(0.6rem) scale(0.97);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+html.js-motion .chat__panel {
+    animation: chat-rise 260ms ease-out both;
+}
+
+html.js-motion .chat__row {
+    animation: chat-rise 220ms ease-out both;
+}
+
+@media (max-width: 640px) {
+    .chat__bubble-label {
+        display: none;
+    }
+
+    .chat__panel {
+        width: calc(100vw - 1.5rem);
+        max-height: calc(100vh - 6rem);
+    }
+
+    .chat__identity {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html.js-motion .chat__panel,
+    html.js-motion .chat__row {
+        animation: none;
+    }
+
+    .chat__bubble-button:hover,
+    .chat__send:hover {
+        transform: none;
+    }
+}
+
+/* The two profiles an editor can pick in Settings are stronger than the
+   visitor's own setting: no rise, no lift, nothing moving on its own. */
+.site-animation-none .chat__panel,
+.site-animation-none .chat__row,
+.site-animation-none .chat__bubble-button:hover,
+.site-animation-none .chat__send:hover {
+    animation: none;
+    transform: none;
+}

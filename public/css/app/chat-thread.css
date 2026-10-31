@@ -1,0 +1,164 @@
+/* ==========================================================================
+   Admin: the live chat thread
+   --------------------------------------------------------------------------
+   Filament compiles its stylesheet from its own sources, which means a
+   Tailwind utility it never uses simply does not exist in
+   `public/css/filament/filament/app.css`. Anything this screen needs beyond
+   Filament's own `fi-` components therefore lives here, written as plain CSS.
+
+   Colours come from the CSS system colours (Canvas, CanvasText, Field) rather
+   than literals: the panel sets `color-scheme: dark` on its dark mode, so the
+   thread follows the admin's theme without a single `.dark` selector.
+   ========================================================================== */
+
+.chat-thread {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+}
+
+.chat-thread__head {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+}
+
+.chat-thread__who {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: CanvasText;
+}
+
+.chat-thread__meta {
+    margin: 0;
+    font-size: 0.75rem;
+    color: color-mix(in oklab, CanvasText 55%, transparent);
+}
+
+/* Newest first in the DOM inside a reversed column: that is what keeps the
+   transcript stuck to the bottom while a reply is being typed. */
+.chat-thread__log {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 0.6rem;
+    min-height: 14rem;
+    max-height: 30rem;
+    padding: 0.85rem;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border: 1px solid color-mix(in oklab, CanvasText 10%, transparent);
+    border-radius: 0.75rem;
+    background: color-mix(in oklab, CanvasText 3%, Canvas);
+}
+
+.chat-thread__empty {
+    margin: 0;
+    font-size: 0.8rem;
+    text-align: center;
+    color: color-mix(in oklab, CanvasText 45%, transparent);
+}
+
+.chat-thread__row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    max-width: 78%;
+}
+
+.chat-thread__row--visitor {
+    align-self: flex-start;
+}
+
+.chat-thread__row--agent {
+    align-self: flex-end;
+    align-items: flex-end;
+}
+
+.chat-thread__row--system {
+    align-self: center;
+    max-width: 100%;
+}
+
+.chat-thread__bubble {
+    margin: 0;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid color-mix(in oklab, CanvasText 8%, transparent);
+    border-radius: 0.9rem 0.9rem 0.9rem 0.25rem;
+    background: Field;
+    color: FieldText;
+    font-size: 0.85rem;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+}
+
+.chat-thread__row--agent .chat-thread__bubble {
+    border-radius: 0.9rem 0.9rem 0.25rem 0.9rem;
+    background: color-mix(in oklab, var(--primary-600) 12%, Field);
+}
+
+.chat-thread__row--system .chat-thread__bubble {
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--gray-400) 18%, Field);
+    font-size: 0.75rem;
+    text-align: center;
+}
+
+.chat-thread__author {
+    margin: 0;
+    padding-inline: 0.3rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: color-mix(in oklab, CanvasText 45%, transparent);
+}
+
+.chat-thread__composer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.chat-thread__textarea {
+    width: 100%;
+    min-height: 4.5rem;
+    resize: vertical;
+    background: transparent;
+}
+
+.chat-thread__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.chat-thread__error {
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--danger-600, #dc2626);
+}
+
+@keyframes chat-thread-rise {
+    from {
+        opacity: 0;
+        transform: translateY(0.4rem);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+.chat-thread__row {
+    animation: chat-thread-rise 200ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .chat-thread__row {
+        animation: none;
+    }
+}

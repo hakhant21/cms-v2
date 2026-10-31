@@ -1,0 +1,61 @@
+# Build context hygiene for the Docker stack.
+#
+# Everything excluded here is either regenerated inside the image (vendor,
+# node_modules, public/build), must never leave this machine (.env, logs) or
+# belongs to a database the containers do not use.
+#
+# One exception is deliberate and load-bearing:
+#   storage/app/public — uploaded images. The image keeps a copy at /seed and
+#       the container restores it into an empty volume on first boot, so a fresh
+#       deploy arrives with its pictures already in place. The content itself is
+#       not copied: MySQL owns it, on a volume, and the seeders make a brand-new
+#       database look like the site. Neither is written back into the image.
+
+# Dependencies and generated assets (rebuilt inside the image)
+/node_modules
+/vendor
+/public/build
+/public/hot
+/public/storage
+/public/css/filament
+/public/js/filament
+/public/fonts/filament
+/storage/*.key
+/storage/pail
+/storage/logs/*
+/storage/framework/cache/data/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/bootstrap/cache/*.php
+
+# Local-only databases: the stack runs on the MySQL container's volume, so a
+# SQLite file has nothing to do in the image.
+/database/*.sqlite
+/database/*.sqlite-journal
+
+# Machine-local secrets and scratch
+.env
+.env.*
+!.env.example
+*.log
+.phpunit.result.cache
+.php-cs-fixer.cache
+auth.json
+.DS_Store
+
+# Local tooling and agent state that has no business in an image
+/.git
+/.github
+/.idea
+/.vscode
+/.cursor
+/.zed
+/.nova
+/.codex
+/.qoder
+/tests
+/crawl.php
+
+# Docs the runtime never reads
+/AGENTS.md
+/CLAUDE.md
