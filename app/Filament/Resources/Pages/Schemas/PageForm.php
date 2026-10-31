@@ -79,9 +79,15 @@ class PageForm
                             ->relationship(
                                 'galleryImages',
                                 'path',
+                                // The relation already orders by pivot sort_order.
+                                // Only add a tie-breaker here, and use a column
+                                // that is in the SELECT list: MySQL rejects an
+                                // ORDER BY on `page_images.id` alongside DISTINCT
+                                // ("Expression #3 of ORDER BY clause is not in
+                                // SELECT list"), which Filament adds for a
+                                // searchable multiple relationship.
                                 modifyQueryUsing: fn (EloquentBuilder $query): EloquentBuilder => $query
-                                    ->orderBy('page_images.sort_order')
-                                    ->orderBy('page_images.id'),
+                                    ->orderBy('images.id'),
                             )
                             ->getOptionLabelFromRecordUsing(fn (Image $record): string => $record->altText() ?: Text::fileName((string) $record->path))
                             ->multiple()
