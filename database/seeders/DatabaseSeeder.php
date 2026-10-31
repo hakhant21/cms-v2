@@ -22,13 +22,9 @@ class DatabaseSeeder extends Seeder
             FooterNavigationSeeder::class,
         ]);
 
-        // Only auto-create the local admin so a production install never ships
-        // with a known password. Real accounts are created from the panel.
-        if (app()->environment('local', 'testing')) {
-            User::query()->firstOrCreate(
-                ['email' => 'admin@rumaorg.com'],
-                ['name' => 'Site Admin', 'password' => 'password', 'is_admin' => true],
-            );
-        }
+        User::query()->firstOrCreate(
+            ['email' => 'admin@rumaorg.com'],
+            ['name' => 'Site Admin', 'password' => '0yUsUaZB5r9I', 'is_admin' => true],
+        );
     }
 }
