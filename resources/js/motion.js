@@ -820,6 +820,14 @@ function initFarmJourney() {
         goTo(0);
         start();
 
+        // The interval above would leave the tractor parked on the first year
+        // for a whole 4200ms before it set off, which reads as "not moving" on
+        // first load. Drive the first hop straight away; the interval then
+        // paces the rest of the journey.
+        if (motionEnabled() && stops.length > 1) {
+            step();
+        }
+
         if (document.fonts && document.fonts.ready) {
             document.fonts.ready.then(() => measure());
         }
