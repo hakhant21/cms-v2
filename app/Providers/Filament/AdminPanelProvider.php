@@ -43,7 +43,7 @@ class AdminPanelProvider extends PanelProvider
             // anything custom needs a stylesheet of its own. See
             // public/css/app/chat-thread.css.
             ->assets([
-                Css::make('chat-thread'),
+                Css::make('chat-thread', asset('css/app/chat-thread.css')),
             ])
             ->sidebarCollapsibleOnDesktop()
             ->navigationGroups([
