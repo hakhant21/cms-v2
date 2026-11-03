@@ -78,6 +78,7 @@ class TranslationTest extends TestCase
                             ['text' => 'Organic'],
                             ['text' => 'Grown locally'],
                         ]],
+                        ['type' => 'button', 'value' => 'Read more', 'url' => '/about'],
                     ],
                 ]],
             ],
@@ -123,14 +124,67 @@ class TranslationTest extends TestCase
         $this->assertSame('[my] About us', $replaced['state']['title']);
     }
 
-    public function test_sections_that_no_longer_match_are_left_alone(): void
+    public function test_an_overwrite_refits_sections_whose_fields_drifted(): void
     {
+        // The products-page case: a button field was added in English after
+        // the other language was translated. The shapes no longer match, and
+        // the run used to skip the whole page silently. Now the destination is
+        // refitted to the source structure and every field is re-translated.
+        $target = ['content_blocks' => [
+            ['type' => 'section', 'data' => [
+                'layout' => 'split',
+                'fields' => [
+                    ['type' => 'title', 'value' => 'Our story'],
+                    ['type' => 'image', 'value' => 'https://example.com/field.jpg'],
+                ],
+            ]],
+        ]];
+
+        $result = (new PageTranslator($this->fakeTranslator()))
+            ->translatePage($this->sourceState(), $target, 'en', 'my', overwrite: true);
+
+        $fields = array_values($result['state']['content_blocks'][0]['data']['fields']);
+
+        $this->assertCount(4, $fields, 'The field the destination lacks arrives from the source.');
+        $this->assertSame('[my] Our story', $fields[0]['value']);
+        $this->assertSame('https://example.com/field.jpg', $fields[1]['value']);
+        $this->assertSame('[my] Organic', $fields[2]['items'][0]['text']);
+
+        // The button's label is prose and is translated; its url is not.
+        $this->assertSame('[my] Read more', $fields[3]['value']);
+        $this->assertSame('/about', $fields[3]['url']);
+    }
+
+    public function test_a_section_of_another_kind_is_replaced_by_the_source_structure(): void
+    {
+        // Structure belongs to the source language: a destination section that
+        // matches nothing in the source gives way to the source's block, in
+        // the language it was written in, ready to be translated.
         $target = ['content_blocks' => [
             ['type' => 'contact_form', 'data' => ['title' => 'Write to us']],
         ]];
 
         $result = (new PageTranslator($this->fakeTranslator()))
             ->translatePage($this->sourceState(), $target, 'en', 'my', overwrite: true);
+
+        $this->assertSame(
+            'section',
+            $result['state']['content_blocks'][0]['type'],
+        );
+        $this->assertSame(
+            '[my] Our story',
+            $result['state']['content_blocks'][0]['data']['fields'][0]['value'],
+        );
+    }
+
+    public function test_without_an_overwrite_drifted_sections_are_left_alone(): void
+    {
+        $target = ['content_blocks' => [
+            ['type' => 'contact_form', 'data' => ['title' => 'Write to us']],
+        ]];
+
+        $result = (new PageTranslator($this->fakeTranslator()))
+            ->translatePage($this->sourceState(), $target, 'en', 'my');
 
         $this->assertSame(
             'contact_form',
@@ -335,6 +389,41 @@ class TranslationTest extends TestCase
         $title = $my->blocks()[0]['data']['fields'][0]['value'] ?? null;
 
         $this->assertSame('[my] Updated heading', $title);
+    }
+
+    public function test_the_translate_action_refuses_to_queue_without_a_key(): void
+    {
+        config(['ai.gemini.key' => '']);
+
+        $page = Page::query()->create([
+            'kind' => Page::KIND_PAGE,
+            'slug' => 'about',
+            'status' => Page::STATUS_PUBLISHED,
+            'published_at' => now(),
+        ]);
+
+        PageTranslation::query()->create([
+            'page_id' => $page->getKey(),
+            'locale' => 'en',
+            'title' => 'About us',
+        ]);
+
+        $editor = User::factory()->admin()->create();
+
+        // A job queued without a key can only ever fail, so the editor is
+        // told at the button instead of by a notification after the fact.
+        Livewire::actingAs($editor)
+            ->test(EditPage::class, ['record' => $page->getRouteKey()])
+            ->callAction('translate', [
+                'from' => 'en',
+                'to' => ['my'],
+            ])
+            ->assertNotified('Machine translation is not set up');
+
+        $this->assertDatabaseMissing('page_translations', [
+            'page_id' => $page->getKey(),
+            'locale' => 'my',
+        ]);
     }
 
     public function test_the_translate_button_is_on_the_page_editor(): void

@@ -3,6 +3,7 @@
 namespace App\Support\Translation;
 
 use App\Contracts\Translator;
+use App\Support\BlockStructure;
 use App\Support\SectionData;
 
 /**
@@ -28,6 +29,12 @@ final class PageTranslator
     ];
 
     public function __construct(private readonly Translator $translator) {}
+
+    /** Whether the underlying translation service can run at all. */
+    public function isConfigured(): bool
+    {
+        return $this->translator->isConfigured();
+    }
 
     /**
      * @param  array<string, mixed>  $source  the language being translated from
@@ -78,10 +85,19 @@ final class PageTranslator
      *
      * When the destination has no sections yet the source layout is copied and
      * filled in, which is the common case: a page written in English and then
-     * translated into Burmese for the first time. Once both sides have sections
-     * they are only rewritten when the editor asked to overwrite, and only when
-     * the shapes still match — translating into a differently arranged page
-     * would put a heading where an image belongs.
+     * translated into Burmese for the first time.
+     *
+     * Once both sides have sections, an overwrite refits the destination to
+     * the source's structure before the words go in. The two shapes drift —
+     * the job writes rows directly, bypassing the editor's structure sync, so
+     * a field added in the source never reaches the other languages. Refitting
+     * keeps whatever the destination already holds where the fields line up
+     * and takes the rest from the source. Skipping drifted sections instead
+     * silently threw the whole page's translation away while still reporting
+     * every string as translated.
+     *
+     * Without an overwrite the destination's sections are left exactly as
+     * they are: the editor asked to fill blanks, not to reshape the page.
      *
      * @param  array<string, mixed>  $source
      * @param  array<string, mixed>  $target
@@ -107,17 +123,71 @@ final class PageTranslator
             return $copy;
         }
 
-        if (! $overwrite || ! $this->sameShape($sourceBlocks, $targetBlocks)) {
+        if (! $overwrite) {
             return $targetBlocks;
         }
 
+        $aligned = BlockStructure::align($sourceBlocks, $targetBlocks);
         $rewritten = [];
 
-        foreach ($targetBlocks as $index => $block) {
-            $rewritten[] = $this->writeTexts($block, $map, "blocks.{$index}.");
+        foreach ($aligned as $index => $block) {
+            $refit = $this->refitFields($sourceBlocks[$index] ?? [], is_array($block) ? $block : []);
+            $rewritten[] = $this->writeTexts($refit, $map, "blocks.{$index}.");
         }
 
         return $rewritten;
+    }
+
+    /**
+     * One destination block wearing the source block's field list.
+     *
+     * Fields are matched by type, the way BlockStructure matches blocks: a
+     * field that lines up keeps everything the destination holds (its words,
+     * and settings such as image ids that never travel through the
+     * translation), a field the destination lacks is taken from the source,
+     * and a field the source no longer has is dropped. The result has the
+     * source's keys and order, so the translated values — keyed by the
+     * source's paths — always land.
+     *
+     * @param  array<string, mixed>  $sourceBlock
+     * @param  array<string, mixed>  $targetBlock
+     * @return array<string, mixed>
+     */
+    private function refitFields(array $sourceBlock, array $targetBlock): array
+    {
+        $sourceFields = $sourceBlock['data']['fields'] ?? null;
+
+        if (! is_array($sourceFields)) {
+            return $targetBlock;
+        }
+
+        $targetFields = is_array($targetBlock['data']['fields'] ?? null) ? $targetBlock['data']['fields'] : [];
+        $fields = [];
+        $claimed = [];
+
+        foreach ($sourceFields as $key => $field) {
+            $type = is_array($field) ? ($field['type'] ?? null) : null;
+            $match = null;
+
+            foreach ($targetFields as $targetKey => $candidate) {
+                if (! in_array($targetKey, $claimed, true)
+                    && is_array($candidate)
+                    && ($candidate['type'] ?? null) === $type) {
+                    $match = $candidate;
+                    $claimed[] = $targetKey;
+
+                    break;
+                }
+            }
+
+            $fields[$key] = $match ?? $field;
+        }
+
+        $block = $targetBlock === [] ? $sourceBlock : $targetBlock;
+        $block['type'] = $sourceBlock['type'] ?? $block['type'] ?? null;
+        $block['data'] = array_merge(is_array($block['data'] ?? null) ? $block['data'] : [], ['fields' => $fields]);
+
+        return $block;
     }
 
     /**
@@ -180,7 +250,10 @@ final class PageTranslator
 
                 $type = (string) ($field['type'] ?? '');
 
-                if (in_array($type, SectionData::TEXT_TYPES, true)) {
+                // A button's value is its visible label — prose like the text
+                // types — while the url beside it is an address and travels
+                // untouched.
+                if (in_array($type, SectionData::TEXT_TYPES, true) || $type === 'button') {
                     $value = $field['value'] ?? null;
 
                     if (is_string($value) && trim($value) !== '') {
@@ -259,38 +332,6 @@ final class PageTranslator
         }
 
         return $data;
-    }
-
-    /**
-     * @param  array<string, mixed>  $source
-     * @param  array<string, mixed>  $target
-     */
-    private function sameShape(array $source, array $target): bool
-    {
-        if (count($source) !== count($target)) {
-            return false;
-        }
-
-        foreach ($source as $index => $block) {
-            $other = $target[$index] ?? null;
-
-            if (! is_array($other)) {
-                return false;
-            }
-
-            if (($block['type'] ?? null) !== ($other['type'] ?? null)) {
-                return false;
-            }
-
-            $sourceFields = is_array($block['data']['fields'] ?? null) ? $block['data']['fields'] : [];
-            $targetFields = is_array($other['data']['fields'] ?? null) ? $other['data']['fields'] : [];
-
-            if (count($sourceFields) !== count($targetFields)) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     /**

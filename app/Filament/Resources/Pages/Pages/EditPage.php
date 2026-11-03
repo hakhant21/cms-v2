@@ -108,11 +108,25 @@ class EditPage extends EditRecord
             return;
         }
 
+        // The job talks to the translation service, so a missing key is
+        // reported here rather than as a job that can only ever fail.
+        $translator = app(PageTranslator::class);
+
+        if (! $translator->isConfigured()) {
+            Notification::make()
+                ->danger()
+                ->title('Machine translation is not set up')
+                ->body('Add GEMINI_API_KEY to the .env file, then translate again.')
+                ->send();
+
+            return;
+        }
+
         // The job translates the saved page, so an empty source here means the
         // editor has not written (or not yet saved) the language they chose.
         $source = PageTranslations::state($this->record)[$from] ?? [];
 
-        if (app(PageTranslator::class)->texts($source) === []) {
+        if ($translator->texts($source) === []) {
             Notification::make()
                 ->warning()
                 ->title('Nothing to translate')
