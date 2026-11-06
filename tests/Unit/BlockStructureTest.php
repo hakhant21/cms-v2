@@ -102,6 +102,122 @@ class BlockStructureTest extends TestCase
         $this::assertSame('translated', $aligned[1]['data']['fields'][0]['value']);
     }
 
+    public function test_mirror_copies_media_and_links_but_keeps_the_translated_words(): void
+    {
+        // Upload once: the image, the button's destination and the layout
+        // belong to the page, while the title, the alt text and the button
+        // label stay in the locale's own words.
+        $canonical = [[
+            'type' => 'section',
+            'data' => [
+                'layout' => 'media',
+                'fields' => [
+                    ['type' => 'title', 'value' => 'English'],
+                    ['type' => 'image', 'value' => 'pages/new.jpg', 'alt' => 'A farm'],
+                    ['type' => 'button', 'value' => 'Read more', 'url' => '/about'],
+                ],
+            ],
+        ]];
+        $locale = [[
+            'type' => 'section',
+            'data' => [
+                'layout' => 'plain',
+                'fields' => [
+                    ['type' => 'title', 'value' => 'မြန်မာ'],
+                    ['type' => 'image', 'value' => 'pages/old.jpg', 'alt' => 'လယ်ယာ'],
+                    ['type' => 'button', 'value' => 'ဆက်ဖတ်ရန်', 'url' => '/old'],
+                ],
+            ],
+        ]];
+
+        $mirrored = BlockStructure::mirror($canonical, $locale);
+        $fields = $mirrored[0]['data']['fields'];
+
+        $this::assertSame('media', $mirrored[0]['data']['layout']);
+        $this::assertSame('မြန်မာ', $fields[0]['value']);
+        $this::assertSame('pages/new.jpg', $fields[1]['value']);
+        $this::assertSame('လယ်ယာ', $fields[1]['alt'], 'A caption the locale already wrote is kept.');
+        $this::assertSame('ဆက်ဖတ်ရန်', $fields[2]['value']);
+        $this::assertSame('/about', $fields[2]['url']);
+    }
+
+    public function test_mirror_labels_a_fresh_image_with_the_source_alt(): void
+    {
+        $canonical = [[
+            'type' => 'section',
+            'data' => ['layout' => 'plain', 'fields' => [
+                ['type' => 'image', 'value' => 'pages/new.jpg', 'alt' => 'A farm'],
+            ]],
+        ]];
+        $locale = [[
+            'type' => 'section',
+            'data' => ['layout' => 'plain', 'fields' => [
+                ['type' => 'image', 'value' => '', 'alt' => ''],
+            ]],
+        ]];
+
+        $mirrored = BlockStructure::mirror($canonical, $locale);
+
+        $this::assertSame('pages/new.jpg', $mirrored[0]['data']['fields'][0]['value']);
+        $this::assertSame('A farm', $mirrored[0]['data']['fields'][0]['alt']);
+    }
+
+    public function test_mirror_carries_gallery_sources_across_and_keeps_translated_captions(): void
+    {
+        $canonical = [[
+            'type' => 'section',
+            'data' => ['layout' => 'plain', 'fields' => [
+                ['type' => 'gallery', 'items' => [
+                    ['src' => 'pages/a.jpg', 'alt' => 'One'],
+                    ['src' => 'pages/b.jpg', 'alt' => 'Two'],
+                ]],
+            ]],
+        ]];
+        $locale = [[
+            'type' => 'section',
+            'data' => ['layout' => 'plain', 'fields' => [
+                ['type' => 'gallery', 'items' => [
+                    ['src' => 'pages/old.jpg', 'alt' => 'တစ်'],
+                ]],
+            ]],
+        ]];
+
+        $mirrored = BlockStructure::mirror($canonical, $locale);
+        $items = $mirrored[0]['data']['fields'][0]['items'];
+
+        $this::assertCount(2, $items, 'A photo added to the gallery reaches every language.');
+        $this::assertSame('pages/a.jpg', $items[0]['src']);
+        $this::assertSame('တစ်', $items[0]['alt']);
+        $this::assertSame('pages/b.jpg', $items[1]['src']);
+        $this::assertSame('Two', $items[1]['alt']);
+    }
+
+    public function test_mirror_matches_fields_by_type_across_mixed_key_formats(): void
+    {
+        // Stored rows are integer-keyed while editor-written blocks can be
+        // uuid-keyed; the match must survive both.
+        $canonical = [[
+            'type' => 'section',
+            'data' => ['layout' => 'plain', 'fields' => [
+                'f47ac10b-58cc-4372-a567-0e02b2c3d479' => ['type' => 'title', 'value' => 'English'],
+                '9b2d1c4e-1f2a-4c3d-9e8f-abcdef123456' => ['type' => 'image', 'value' => 'pages/new.jpg'],
+            ]],
+        ]];
+        $locale = [[
+            'type' => 'section',
+            'data' => ['layout' => 'plain', 'fields' => [
+                ['type' => 'title', 'value' => 'မြန်မာ'],
+                ['type' => 'image', 'value' => 'pages/old.jpg'],
+            ]],
+        ]];
+
+        $mirrored = BlockStructure::mirror($canonical, $locale);
+        $fields = $mirrored[0]['data']['fields'];
+
+        $this::assertSame('မြန်မာ', $fields['f47ac10b-58cc-4372-a567-0e02b2c3d479']['value']);
+        $this::assertSame('pages/new.jpg', $fields['9b2d1c4e-1f2a-4c3d-9e8f-abcdef123456']['value']);
+    }
+
     /**
      * @param  array<int, string>  $fields
      * @return array<string, mixed>

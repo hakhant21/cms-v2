@@ -69,9 +69,6 @@
                         decoding="async"
                     >
                 </a>
-                @if ($alt !== '')
-                    <figcaption class="mt-2 text-xs text-stone-500">{{ $alt }}</figcaption>
-                @endif
             </figure>
         @endif
         @break
@@ -136,6 +133,7 @@
         @if ($value)
             <a
                 href="{{ $url !== '' ? locale_path($url) : '#' }}"
+                @if (! \Illuminate\Support\Str::startsWith($url, ['http://', 'https://'])) wire:navigate @endif
                 @class([
                     'btn-glow mt-6 inline-flex items-center gap-2 rounded-full px-8 py-3.5 text-sm font-semibold',
                     'bg-lime-300 text-green-950' => $dark,

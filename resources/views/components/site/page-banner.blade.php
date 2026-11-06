@@ -16,7 +16,7 @@
     <div class="page-banner__scrim" aria-hidden="true"></div>
 
     <nav aria-label="Breadcrumb" class="page-banner__crumbs">
-        <a href="{{ locale_path('/') }}" class="page-banner__crumb-link">{{ __('ui.nav.home_page') }}</a>
+        <a href="{{ locale_path('/') }}" wire:navigate class="page-banner__crumb-link">{{ __('ui.nav.home_page') }}</a>
         <span class="page-banner__crumb-sep" aria-hidden="true">/</span>
         <span class="page-banner__crumb-current" aria-current="page">{{ $title }}</span>
     </nav>

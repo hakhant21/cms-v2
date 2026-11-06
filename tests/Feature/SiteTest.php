@@ -293,6 +293,19 @@ class SiteTest extends TestCase
             ->assertDontSee('Browse all');
     }
 
+    public function test_internal_links_navigate_without_a_full_page_reload(): void
+    {
+        $this->get('/')
+            ->assertOk()
+            // Livewire must load even on a page without the chat bubble: its
+            // navigate links are what swap pages without a browser reload.
+            ->assertSee('livewire.js', false)
+            ->assertSee('wire:navigate', false)
+            // The shared lightbox survives page swaps instead of being
+            // rebuilt — and re-bound — on every visit.
+            ->assertSee('x-persist="lightbox"', false);
+    }
+
     public function test_theme_colours_from_the_admin_are_written_into_the_page(): void
     {
         Setting::put('theme.primary', '#123456', 'theme');

@@ -59,6 +59,10 @@
 
 @vite(['resources/css/app.css', 'resources/css/motion.css', 'resources/js/app.js'])
 
+{{-- Livewire on every page, not only the ones with the chat bubble: its
+     `wire:navigate` links swap pages without a full browser reload. --}}
+@livewireScripts
+
 @if (\App\Support\Chat::enabled())
     {{-- Echo is a separate entry, pulled in only by a site that really offers a
          chat: the broadcast client is most of the site's JavaScript and pages

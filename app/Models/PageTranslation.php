@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class PageTranslation extends Model
 {
     /** @var list<string> */
-    protected $fillable = ['page_id', 'locale', 'title', 'excerpt', 'content_blocks', 'seo'];
+    protected $fillable = ['page_id', 'locale', 'title', 'excerpt', 'content_blocks', 'seo', 'is_manual'];
 
     /**
      * @return array<string, string>
@@ -19,6 +19,7 @@ class PageTranslation extends Model
         return [
             'content_blocks' => 'array',
             'seo' => 'array',
+            'is_manual' => 'boolean',
         ];
     }
 

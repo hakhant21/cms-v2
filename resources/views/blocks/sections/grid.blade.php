@@ -84,6 +84,7 @@
             <div class="mt-12 text-center" data-reveal>
                 <a
                     href="{{ $button['url'] !== '' ? locale_path($button['url']) : '#' }}"
+                    @if (! \Illuminate\Support\Str::startsWith($button['url'], ['http://', 'https://'])) wire:navigate @endif
                     class="btn-glow inline-flex items-center gap-2 rounded-full bg-green-700 px-8 py-3.5 text-sm font-semibold text-white"
                 >
                     {{ $button['label'] }}

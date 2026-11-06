@@ -28,6 +28,7 @@ return new class extends Migration
 
             $table->json('content_blocks')->nullable();
             $table->json('seo')->nullable(); // title, description, og_image, canonical, robots
+            $table->boolean('is_manual')->default(false); // hand-written copy is kept from auto-translation
 
             $table->timestamps();
 

@@ -32,14 +32,21 @@
 
     {{-- The bubble belongs to the shell rather than to a page block: a visitor
          who wanders off to read a product page and comes back finds the same
-         conversation, because the token in their session names it. --}}
+         conversation, because the token in their session names it. @persist
+         keeps the very same component alive across wire:navigate visits, so an
+         open panel is not folded away by a page swap. --}}
     @if (\App\Support\Chat::enabled())
-        <livewire:chat-widget />
+        @persist('chat')
+            <livewire:chat-widget />
+        @endpersist
     @endif
 
     {{-- One lightbox for the whole site: every image on a page shares it, so a
-         gallery of twelve lab reports costs one dialog in the DOM. --}}
-    @include('site.partials.lightbox')
+         gallery of twelve lab reports costs one dialog in the DOM. Persisted
+         for the same reason as the chat: its listeners are bound once. --}}
+    @persist('lightbox')
+        @include('site.partials.lightbox')
+    @endpersist
 
     @stack('scripts')
 </body>

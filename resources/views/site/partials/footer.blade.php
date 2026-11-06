@@ -61,7 +61,7 @@
                         @foreach ($footerLinks as $item)
                             <li>
                                 @if ($item->children->isEmpty())
-                                    <a href="{{ LocaleUrl::path($item->href()) }}" class="text-sm text-stone-300 transition-colors hover:text-lime-300">
+                                    <a href="{{ LocaleUrl::path($item->href()) }}" wire:navigate class="text-sm text-stone-300 transition-colors hover:text-lime-300">
                                         {{ $item->localizedLabel() }}
                                     </a>
                                 @else
@@ -73,7 +73,7 @@
                                     <ul class="mt-2 space-y-1.5 border-l border-white/10 pl-3">
                                         @foreach ($item->children as $child)
                                             <li>
-                                                <a href="{{ LocaleUrl::path($child->href()) }}" class="text-sm text-stone-400 transition-colors hover:text-lime-300">
+                                                <a href="{{ LocaleUrl::path($child->href()) }}" wire:navigate class="text-sm text-stone-400 transition-colors hover:text-lime-300">
                                                     {{ $child->localizedLabel() }}
                                                 </a>
                                             </li>

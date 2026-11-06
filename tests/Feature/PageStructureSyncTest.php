@@ -13,9 +13,10 @@ use Livewire\Livewire;
 use Tests\TestCase;
 
 /**
- * Sections are managed once, in the main language tab. Deleting, adding or
- * reordering a section there must re-fit every other language automatically —
- * an editor should never have to remove the same section three times.
+ * Sections are managed once, in whichever tab the editor works in. Deleting,
+ * adding or reordering a section in ANY language must re-fit every other
+ * language automatically — an editor should never have to make the same
+ * change three times, nor switch tabs to make it.
  */
 class PageStructureSyncTest extends TestCase
 {
@@ -106,6 +107,90 @@ class PageStructureSyncTest extends TestCase
             ->set('data.translations.en.content_blocks', $blocks)
             ->assertSet('data.translations.my.content_blocks', fn (mixed $current): bool => $this->valueAt((array) $current, 0) === 'ကျွန်ုပ်တို့၏ ဇာတ်ကြောင်း'
                 && $this->valueAt((array) $current, 1) === 'ကိုယ်ပိုင်း');
+    }
+
+    public function test_an_image_uploaded_in_the_main_language_shows_in_every_language(): void
+    {
+        // Upload once: the photo belongs to the page, not to a language, so
+        // the other tabs receive it while keeping their own words.
+        $withImage = $this->section('hero', 'Our story');
+        $withImage['data']['fields'][] = ['key' => 'img', 'type' => 'image', 'value' => 'pages/farm.jpg', 'alt' => 'The farm'];
+
+        $this->editor()
+            ->set('data.translations.en.content_blocks', [$withImage, $this->section('plain', 'Body text')])
+            ->assertSet('data.translations.my.content_blocks', function (mixed $blocks): bool {
+                $blocks = array_values((array) $blocks);
+                $fields = array_values((array) ($blocks[0]['data']['fields'] ?? []));
+                $image = null;
+
+                foreach ($fields as $field) {
+                    if (($field['type'] ?? null) === 'image') {
+                        $image = $field;
+                    }
+                }
+
+                return $this->valueAt($blocks, 0) === 'ကျွန်ုပ်တို့၏ ဇာတ်ကြောင်း'
+                    && ($image['value'] ?? null) === 'pages/farm.jpg'
+                    && ($image['alt'] ?? null) === 'The farm';
+            });
+    }
+
+    public function test_reordering_in_a_non_default_language_reorders_the_default_too(): void
+    {
+        // The editor works in Burmese only: the shuffle must reach English
+        // without anyone touching the English tab.
+        $my = $this->editor()->get('data.translations.my.content_blocks');
+        $reversed = array_reverse(array_values($my), true);
+
+        $this->editor()
+            ->set('data.translations.my.content_blocks', $reversed)
+            ->assertSet('data.translations.en.content_blocks', fn (mixed $blocks): bool => is_array($blocks)
+                && $this->layoutAt($blocks, 0) === 'plain'
+                && $this->valueAt($blocks, 0) === 'Body text'
+                && $this->layoutAt($blocks, 1) === 'hero'
+                && $this->valueAt($blocks, 1) === 'Our story');
+    }
+
+    public function test_a_section_added_in_a_non_default_language_lands_in_the_default_too(): void
+    {
+        $my = array_values($this->editor()->get('data.translations.my.content_blocks'));
+        $my[] = $this->section('cta', 'ဆက်သွယ်ရန်');
+
+        $this->editor()
+            ->set('data.translations.my.content_blocks', $my)
+            ->assertSet('data.translations.en.content_blocks', fn (mixed $blocks): bool => is_array($blocks)
+                && count($blocks) === 3
+                && $this->layoutAt($blocks, 2) === 'cta'
+                // The existing English sections keep their own words.
+                && $this->valueAt($blocks, 0) === 'Our story'
+                && $this->valueAt($blocks, 1) === 'Body text');
+    }
+
+    public function test_a_section_deleted_in_a_non_default_language_is_deleted_everywhere(): void
+    {
+        $my = array_values($this->editor()->get('data.translations.my.content_blocks'));
+
+        $this->editor()
+            ->set('data.translations.my.content_blocks', [$my[1]])
+            ->assertSet('data.translations.en.content_blocks', fn (mixed $blocks): bool => is_array($blocks)
+                && count($blocks) === 1
+                && $this->layoutAt($blocks, 0) === 'plain'
+                && $this->valueAt($blocks, 0) === 'Body text');
+    }
+
+    public function test_typing_words_in_a_non_default_language_leaves_the_default_words_alone(): void
+    {
+        $my = array_values($this->editor()->get('data.translations.my.content_blocks'));
+        // The builder keys its fields by uuid — edit the field that exists,
+        // the way typing in the tab does.
+        $key = array_key_first($my[0]['data']['fields']);
+        $my[0]['data']['fields'][$key]['value'] = 'ကိုယ်တိုင်ရေးသော ခေါင်းစဉ်';
+
+        $this->editor()
+            ->set('data.translations.my.content_blocks', $my)
+            ->assertSet('data.translations.en.content_blocks', fn (mixed $blocks): bool => $this->valueAt((array) $blocks, 0) === 'Our story'
+                && $this->valueAt((array) $blocks, 1) === 'Body text')
+            ->assertSet('data.translations.my.content_blocks', fn (mixed $blocks): bool => $this->valueAt((array) $blocks, 0) === 'ကိုယ်တိုင်ရေးသော ခေါင်းစဉ်');
     }
 
     /** @return Testable */

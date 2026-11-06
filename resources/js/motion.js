@@ -23,6 +23,9 @@ const motionEnabled = () =>
  * of finding every section already parked visible, which is what the old
  * one-shot `unobserve()` produced.
  */
+let revealObserver = null;
+let revealWatcherBound = false;
+
 function initReveal() {
     const showAll = () => {
         document
@@ -32,13 +35,18 @@ function initReveal() {
 
     const animate = 'IntersectionObserver' in window && motionEnabled();
 
+    // A wire:navigate visit boots again: the previous observer is dropped so
+    // ten page swaps never leave ten observers toggling the same classes.
+    revealObserver?.disconnect();
+    revealObserver = null;
+
     if (!animate) {
         showAll();
 
         return;
     }
 
-    const observer = new IntersectionObserver(
+    revealObserver = new IntersectionObserver(
         (entries) => {
             entries.forEach((entry) => {
                 entry.target.classList.toggle('is-inview', entry.isIntersecting);
@@ -63,30 +71,42 @@ function initReveal() {
             element.classList.add('is-inview');
         }
 
-        observer.observe(element);
+        revealObserver.observe(element);
     };
+
+    // The flags belonged to the observer that was just disconnected; clearing
+    // them lets every element — persisted ones included — join the new one.
+    document
+        .querySelectorAll('[data-reveal]')
+        .forEach((element) => delete element.dataset.revealReady);
 
     document.querySelectorAll('[data-reveal]').forEach(register);
 
     // Blocks, form results and anything else swapped in after load would
     // otherwise stay at `opacity: 0`, which is exactly what happened to the
     // contact form's success message. Watch the DOM and register them too.
-    new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-            mutation.addedNodes.forEach((node) => {
-                if (node.nodeType !== Node.ELEMENT_NODE) {
-                    return;
-                }
+    // Bound once: the watcher outlives every page swap and always feeds the
+    // current observer.
+    if (!revealWatcherBound) {
+        revealWatcherBound = true;
 
-                if (node.matches('[data-reveal]')) {
-                    register(node);
-                }
+        new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                mutation.addedNodes.forEach((node) => {
+                    if (node.nodeType !== Node.ELEMENT_NODE) {
+                        return;
+                    }
 
-                node.querySelectorAll?.('[data-reveal-group]').forEach(stagger);
-                node.querySelectorAll?.('[data-reveal]').forEach(register);
+                    if (node.matches('[data-reveal]')) {
+                        register(node);
+                    }
+
+                    node.querySelectorAll?.('[data-reveal-group]').forEach(stagger);
+                    node.querySelectorAll?.('[data-reveal]').forEach(register);
+                });
             });
-        });
-    }).observe(document.body, { childList: true, subtree: true });
+        }).observe(document.body, { childList: true, subtree: true });
+    }
 }
 
 /** Stagger direct children inside a reveal group. */
@@ -278,16 +298,21 @@ function initHeaderMenus() {
     );
 }
 
+let stickyHeaderBound = false;
+
 /** Shadow on the sticky header once the page has moved. */
 function initStickyHeader() {
-    const header = document.querySelector('[data-site-header]');
-
-    if (!header) {
+    if (stickyHeaderBound) {
         return;
     }
 
+    stickyHeaderBound = true;
+
     const update = () => {
-        header.classList.toggle('is-scrolled', window.scrollY > 12);
+        // Re-queried on every scroll: a page swap hands back a new header.
+        document
+            .querySelector('[data-site-header]')
+            ?.classList.toggle('is-scrolled', window.scrollY > 12);
     };
 
     update();
@@ -321,9 +346,11 @@ function initAccordion() {
 function initSlider() {
     const slider = document.querySelector('[data-slider]');
 
-    if (!slider) {
+    if (!slider || slider.dataset.sliderReady === 'true') {
         return;
     }
+
+    slider.dataset.sliderReady = 'true';
 
     const slides = Array.from(slider.querySelectorAll('[data-slide]'));
     const dots = Array.from(slider.querySelectorAll('[data-slide-dot]'));
@@ -365,7 +392,16 @@ function initSlider() {
         }
 
         stop();
-        timer = window.setInterval(() => show(active + 1), interval);
+        timer = window.setInterval(() => {
+            // A page swap detaches the slider; its timer must not outlive it.
+            if (!slider.isConnected) {
+                stop();
+
+                return;
+            }
+
+            show(active + 1);
+        }, interval);
     };
 
     const stop = () => {
@@ -747,7 +783,17 @@ function initFarmJourney() {
                 return;
             }
 
-            ticking = window.setInterval(step, interval);
+            ticking = window.setInterval(() => {
+                // A page swap detaches the journey; stop rather than drive on
+                // through a road that is no longer on the page.
+                if (!journey.isConnected) {
+                    stop();
+
+                    return;
+                }
+
+                step();
+            }, interval);
         };
 
         const stop = () => {
@@ -936,7 +982,17 @@ function initCarousel() {
                 return;
             }
 
-            timer = window.setInterval(() => show(active + 1), interval);
+            timer = window.setInterval(() => {
+                // A page swap detaches the carousel; its timer must not keep
+                // sliding a track that is no longer on the page.
+                if (!carousel.isConnected) {
+                    stop();
+
+                    return;
+                }
+
+                show(active + 1);
+            }, interval);
         };
 
         carousel.querySelector('[data-carousel-prev]')?.addEventListener('click', () => {

@@ -1607,16 +1607,16 @@
                                 "layout": "hero",
                                 "fields": [
                                     {
-                                        "type": "eyebrow",
-                                        "value": "Our Product"
-                                    },
-                                    {
                                         "type": "title",
-                                        "value": "Russia Technology Myanmar Growth"
+                                        "value": "Healthy Soil. Better Crops. Prosperous Farmers. A More Sustainable Future."
                                     },
                                     {
                                         "type": "paragraph",
-                                        "value": "Sustainable agricultural innovation for better harvests and healthy soil."
+                                        "value": "Ruma Organic connects Russian agricultural knowledge with Myanmar field experience to support healthier soils, stronger crop development, and more productive farming."
+                                    },
+                                    {
+                                        "type": "paragraph",
+                                        "value": "Through Humic-based soil and plant nutrition products, quality seeds, and field-based agricultural programs, we work with farmers and partners to improve crop performance, use resources more responsibly, and support the production of safer food through more efficient and responsible agricultural practices."
                                     },
                                     {
                                         "type": "globe",
@@ -1741,16 +1741,16 @@
                                 "layout": "hero",
                                 "fields": [
                                     {
-                                        "type": "eyebrow",
-                                        "value": "ကျွန်ုပ်တို့၏ ထုတ်ကုန်"
-                                    },
-                                    {
                                         "type": "title",
-                                        "value": "ရုရှားနည်းပညာ မြန်မာ့စိုက်ပျိုးရေးဖွံ့ဖြိုးတိုးတက်မှု"
+                                        "value": "ကျန်းမာပြီး အာဟာရပြည့်ဝတဲ့ မြေ၊ ပိုကောင်းတဲ့ သီးနှံ၊ လုံခြုံဘေးကင်းတဲ့ အစားအစာထုတ်လုပ်ရေး၊ ပိုကောင်းတဲ့ဝင်ငွေနဲ့ လူနေမှုဘဝ၊ ရေရှည်တည်တံ့ခိုင်မြဲတဲ့ အနာဂတ်"
                                     },
                                     {
                                         "type": "paragraph",
-                                        "value": "ပိုမိုကောင်းမွန်သော သီးနှံထွက်နှုန်းနှင့် မြေဆီလွှာကျန်းမာရေးအတွက် ရေရှည်တည်တံ့သော စိုက်ပျိုးရေးဆန်းသစ်တီထွင်မှု။"
+                                        "value": "ပိုမိုကျန်းမာသော မြေဆီလွှာ၊ ပိုမိုသန်စွမ်းသော သီးနှံဖွံ့ဖြိုးမှုနှင့် ပိုမိုအထွက်ကောင်းသော စိုက်ပျိုးရေးအတွက် Ruma Organic သည် ရုရှားစိုက်ပျိုးရေး အသိပညာကို မြန်မာ့ကွင်းဆင်း အတွေ့အကြုံနှင့် ချိတ်ဆက်ပေးပါသည်။"
+                                    },
+                                    {
+                                        "type": "paragraph",
+                                        "value": "ဟူးမစ်အခြေခံ မြေဆီလွှာနှင့် အပင်အာဟာရ ထုတ်ကုန်များ၊ အရည်အသွေးမြင့် မျိုးစေ့များနှင့် ကွင်းဆင်းစိုက်ပျိုးရေး အစီအစဉ်များမှတစ်ဆင့် တောင်သူများ၊ မိတ်ဖက်များနှင့်အတူ သီးနှံစွမ်းဆောင်ရည် တိုးတက်စေရန်၊ သယံဇာတများကို ပိုမိုတာဝန်ယူစွာ အသုံးပြုရန်နှင့် ပိုမိုထိရောက်ပြီး တာဝန်ရှိသော စိုက်ပျိုးရေးနည်းလမ်းများဖြင့် ပိုမိုဘေးကင်းသော အစားအစာ ထုတ်လုပ်မှုကို ပံ့ပိုးပေးရန် ဆောင်ရွက်လျက်ရှိပါသည်။"
                                     },
                                     {
                                         "type": "globe",
@@ -1875,16 +1875,16 @@
                                 "layout": "hero",
                                 "fields": [
                                     {
-                                        "type": "eyebrow",
-                                        "value": "Наша продукция"
-                                    },
-                                    {
                                         "type": "title",
-                                        "value": "Российские технологии для роста в Мьянме"
+                                        "value": "Здоровая почва. Лучшие урожаи. Процветающие фермеры. Более устойчивое будущее."
                                     },
                                     {
                                         "type": "paragraph",
-                                        "value": "Экологичные сельскохозяйственные инновации для лучших урожаев и здоровой почвы."
+                                        "value": "Ruma Organic объединяет российские сельскохозяйственные знания с полевым опытом Мьянмы, чтобы способствовать более здоровым почвам, более сильному развитию культур и более продуктивному земледелию."
+                                    },
+                                    {
+                                        "type": "paragraph",
+                                        "value": "С помощью продуктов на основе гуминовых кислот для питания почвы и растений, качественных семян и полевых сельскохозяйственных программ мы работаем с фермерами и партнёрами, чтобы повысить урожайность, более ответственно использовать ресурсы и поддержать производство более безопасных продуктов питания благодаря более эффективным и ответственным методам ведения сельского хозяйства."
                                     },
                                     {
                                         "type": "globe",

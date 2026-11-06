@@ -194,7 +194,8 @@ return [
 
     'navigate' => [
         'show_progress_bar' => true,
-        'progress_bar_color' => '#2299dd',
+        // The site's lime accent, so the loading bar reads as part of the brand.
+        'progress_bar_color' => '#a3e635',
     ],
 
     /*

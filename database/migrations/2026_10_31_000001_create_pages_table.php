@@ -26,6 +26,7 @@ return new class extends Migration
             $table->foreignId('featured_image_id')->nullable()->constrained('images')->nullOnDelete();
 
             $table->string('animation')->nullable(); // per-page override of the site-wide animation
+            $table->boolean('auto_translate')->default(true); // saving the default language queues the others
             $table->unsignedInteger('sort_order')->default(0);
             $table->timestamp('published_at')->nullable();
 

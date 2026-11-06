@@ -59,10 +59,16 @@ final class PageTranslations
      * Persist the submitted locales. A locale whose fields are all empty is
      * deleted, which is how an editor intentionally removes a translation.
      *
+     * The share image and the search-engine setting are not language: a locale
+     * that has not chosen its own inherits the default language's, so the
+     * image is uploaded once for the whole page.
+     *
      * @param  array<string, array<string, mixed>>  $state
      */
     public static function sync(Page $page, array $state): void
     {
+        $defaultSeo = self::seo($state[Language::defaultCode()]['seo'] ?? null);
+
         foreach (Language::activeCodes() as $code) {
             $values = $state[$code] ?? [];
 
@@ -70,6 +76,12 @@ final class PageTranslations
             $excerpt = trim((string) ($values['excerpt'] ?? ''));
             $blocks = self::blocks($values['content_blocks'] ?? null);
             $seo = self::seo($values['seo'] ?? null);
+
+            foreach (['og_image', 'robots'] as $key) {
+                if (! isset($seo[$key]) && isset($defaultSeo[$key])) {
+                    $seo[$key] = $defaultSeo[$key];
+                }
+            }
 
             if ($title === '' && $excerpt === '' && $blocks === [] && $seo === []) {
                 $page->translations()->where('locale', $code)->delete();

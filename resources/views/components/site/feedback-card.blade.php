@@ -40,6 +40,7 @@
         @if ($href !== '')
             <a
                 href="{{ locale_path($href) }}"
+                wire:navigate
                 class="ml-auto inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-green-700 transition hover:gap-2"
                 aria-label="{{ __('ui.common.view_details') }} — {{ $farmer }}"
             >

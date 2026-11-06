@@ -48,6 +48,7 @@ class Page extends Model
         'kind' => self::KIND_PAGE,
         'status' => self::STATUS_DRAFT,
         'sort_order' => 0,
+        'auto_translate' => true,
     ];
 
     /** @var list<string> */
@@ -59,6 +60,7 @@ class Page extends Model
         'animation',
         'sort_order',
         'published_at',
+        'auto_translate',
     ];
 
     /**
@@ -69,6 +71,7 @@ class Page extends Model
         return [
             'published_at' => 'datetime',
             'sort_order' => 'integer',
+            'auto_translate' => 'boolean',
         ];
     }
 

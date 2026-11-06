@@ -16,18 +16,6 @@ use App\Support\SectionData;
  */
 final class PageTranslator
 {
-    /** Keys outside a section that hold a sentence rather than a setting. */
-    private const PROSE_KEYS = [
-        'title',
-        'subtitle',
-        'heading',
-        'intro',
-        'text',
-        'description',
-        'caption',
-        'button_label',
-    ];
-
     public function __construct(private readonly Translator $translator) {}
 
     /** Whether the underlying translation service can run at all. */
@@ -87,14 +75,15 @@ final class PageTranslator
      * filled in, which is the common case: a page written in English and then
      * translated into Burmese for the first time.
      *
-     * Once both sides have sections, an overwrite refits the destination to
+     * Once both sides have sections, an overwrite mirrors the destination to
      * the source's structure before the words go in. The two shapes drift —
      * the job writes rows directly, bypassing the editor's structure sync, so
-     * a field added in the source never reaches the other languages. Refitting
-     * keeps whatever the destination already holds where the fields line up
-     * and takes the rest from the source. Skipping drifted sections instead
-     * silently threw the whole page's translation away while still reporting
-     * every string as translated.
+     * a field added in the source never reaches the other languages. Mirroring
+     * keeps whatever the destination already holds where the fields line up,
+     * takes the rest from the source, and carries the media (images, galleries,
+     * links) across so an upload in the source reaches every language.
+     * Skipping drifted sections instead silently threw the whole page's
+     * translation away while still reporting every string as translated.
      *
      * Without an overwrite the destination's sections are left exactly as
      * they are: the editor asked to fill blanks, not to reshape the page.
@@ -127,67 +116,14 @@ final class PageTranslator
             return $targetBlocks;
         }
 
-        $aligned = BlockStructure::align($sourceBlocks, $targetBlocks);
+        $mirrored = BlockStructure::mirror($sourceBlocks, $targetBlocks);
         $rewritten = [];
 
-        foreach ($aligned as $index => $block) {
-            $refit = $this->refitFields($sourceBlocks[$index] ?? [], is_array($block) ? $block : []);
-            $rewritten[] = $this->writeTexts($refit, $map, "blocks.{$index}.");
+        foreach ($mirrored as $index => $block) {
+            $rewritten[] = $this->writeTexts(is_array($block) ? $block : [], $map, "blocks.{$index}.");
         }
 
         return $rewritten;
-    }
-
-    /**
-     * One destination block wearing the source block's field list.
-     *
-     * Fields are matched by type, the way BlockStructure matches blocks: a
-     * field that lines up keeps everything the destination holds (its words,
-     * and settings such as image ids that never travel through the
-     * translation), a field the destination lacks is taken from the source,
-     * and a field the source no longer has is dropped. The result has the
-     * source's keys and order, so the translated values — keyed by the
-     * source's paths — always land.
-     *
-     * @param  array<string, mixed>  $sourceBlock
-     * @param  array<string, mixed>  $targetBlock
-     * @return array<string, mixed>
-     */
-    private function refitFields(array $sourceBlock, array $targetBlock): array
-    {
-        $sourceFields = $sourceBlock['data']['fields'] ?? null;
-
-        if (! is_array($sourceFields)) {
-            return $targetBlock;
-        }
-
-        $targetFields = is_array($targetBlock['data']['fields'] ?? null) ? $targetBlock['data']['fields'] : [];
-        $fields = [];
-        $claimed = [];
-
-        foreach ($sourceFields as $key => $field) {
-            $type = is_array($field) ? ($field['type'] ?? null) : null;
-            $match = null;
-
-            foreach ($targetFields as $targetKey => $candidate) {
-                if (! in_array($targetKey, $claimed, true)
-                    && is_array($candidate)
-                    && ($candidate['type'] ?? null) === $type) {
-                    $match = $candidate;
-                    $claimed[] = $targetKey;
-
-                    break;
-                }
-            }
-
-            $fields[$key] = $match ?? $field;
-        }
-
-        $block = $targetBlock === [] ? $sourceBlock : $targetBlock;
-        $block['type'] = $sourceBlock['type'] ?? $block['type'] ?? null;
-        $block['data'] = array_merge(is_array($block['data'] ?? null) ? $block['data'] : [], ['fields' => $fields]);
-
-        return $block;
     }
 
     /**
@@ -279,7 +215,7 @@ final class PageTranslator
             return $texts;
         }
 
-        foreach (self::PROSE_KEYS as $key) {
+        foreach (BlockStructure::PROSE_KEYS as $key) {
             $value = $data[$key] ?? null;
 
             if (is_string($value) && trim($value) !== '') {

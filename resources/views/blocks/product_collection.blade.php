@@ -9,7 +9,7 @@
             @if ($title)
                 <div class="flex flex-wrap items-end justify-between gap-4" data-reveal>
                     <h2 class="max-w-2xl text-3xl font-black tracking-tight text-stone-900 sm:text-4xl">{{ $title }}</h2>
-                    <a href="{{ locale_path('/products') }}" class="inline-flex items-center gap-2 text-sm font-semibold text-green-700 transition hover:gap-3">
+                    <a href="{{ locale_path('/products') }}" wire:navigate class="inline-flex items-center gap-2 text-sm font-semibold text-green-700 transition hover:gap-3">
                         {{ __('ui.common.browse_all') }}
                         <x-site.icon name="arrow-right" class="h-4 w-4" />
                     </a>
@@ -19,7 +19,7 @@
             <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3" data-reveal-group>
                 @foreach ($items as $item)
                     <article class="content-card" data-reveal>
-                        <a href="{{ locale_path((string) $item['url']) }}" class="group flex h-full flex-col">
+                        <a href="{{ locale_path((string) $item['url']) }}" wire:navigate class="group flex h-full flex-col">
                             <div class="relative aspect-[4/3] overflow-hidden bg-stone-100">
                                 @if (! empty($item['image_url']))
                                     <img

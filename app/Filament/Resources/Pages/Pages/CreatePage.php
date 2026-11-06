@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Pages\Pages;
 
 use App\Filament\Resources\Pages\PageResource;
 use App\Support\PageTranslations;
+use App\Support\Translation\AutoTranslation;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreatePage extends CreateRecord
@@ -22,7 +23,7 @@ class CreatePage extends CreateRecord
 
     protected function afterCreate(): void
     {
-        PageTranslations::sync($this->record, $this->translations);
+        AutoTranslation::save($this->record, $this->translations);
         $this->record->reorderGallery(array_map('intval', (array) ($this->data['gallery'] ?? [])));
     }
 

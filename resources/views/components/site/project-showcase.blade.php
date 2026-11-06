@@ -34,12 +34,12 @@
 <nav aria-label="Breadcrumb" class="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8" data-reveal>
     <ol class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-medium text-stone-500">
         <li>
-            <a href="{{ locale_path('/') }}" class="transition hover:text-green-700">{{ __('ui.nav.home_page') }}</a>
+            <a href="{{ locale_path('/') }}" wire:navigate class="transition hover:text-green-700">{{ __('ui.nav.home_page') }}</a>
         </li>
         <li aria-hidden="true" class="text-stone-300">/</li>
         @if ($listing !== null)
             <li>
-                <a href="{{ locale_path($listing) }}" class="transition hover:text-green-700">{{ __('ui.nav.next_projects') }}</a>
+                <a href="{{ locale_path($listing) }}" wire:navigate class="transition hover:text-green-700">{{ __('ui.nav.next_projects') }}</a>
             </li>
             <li aria-hidden="true" class="text-stone-300">/</li>
         @endif
@@ -160,7 +160,7 @@
                     {{ __('ui.next_projects.more_title') }}
                 </h2>
                 @if ($listing !== null)
-                    <a href="{{ locale_path($listing) }}" class="inline-flex items-center gap-2 text-sm font-semibold text-green-700 transition hover:gap-3">
+                    <a href="{{ locale_path($listing) }}" wire:navigate class="inline-flex items-center gap-2 text-sm font-semibold text-green-700 transition hover:gap-3">
                         {{ __('ui.common.browse_all') }}
                         <x-site.icon name="arrow-right" class="h-4 w-4" />
                     </a>
@@ -170,7 +170,7 @@
             <div class="mt-8 grid gap-6 md:grid-cols-3" data-reveal-group>
                 @foreach ($siblings as $sibling)
                     <article class="content-card" data-reveal>
-                        <a href="{{ locale_path($sibling->path()) }}" class="group flex h-full flex-col">
+                        <a href="{{ locale_path($sibling->path()) }}" wire:navigate class="group flex h-full flex-col">
                             <div class="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-lime-50 to-green-50">
                                 @if ($sibling->featuredImage !== null)
                                     <img
@@ -212,6 +212,7 @@
             <p class="mt-4 leading-8 text-green-100">{{ __('ui.next_projects.cta_text') }}</p>
             <a
                 href="{{ locale_path($contact) }}"
+                wire:navigate
                 class="btn-glow mt-8 inline-flex items-center gap-2 rounded-full bg-white px-7 py-3 text-sm font-semibold text-green-700 transition hover:bg-green-50"
             >
                 {{ __('ui.next_projects.cta_button') }}

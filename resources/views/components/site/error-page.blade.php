@@ -31,6 +31,7 @@
         <div class="mt-9 flex flex-wrap items-center justify-center gap-3">
             <a
                 href="{{ LocaleUrl::path('/') }}"
+                wire:navigate
                 class="btn-glow inline-flex items-center gap-2 rounded-full bg-green-700 px-7 py-3.5 text-sm font-semibold text-white transition hover:bg-green-800"
             >
                 <x-site.icon name="arrow-left" class="h-4 w-4" />
@@ -48,6 +49,7 @@
                         <li>
                             <a
                                 href="{{ LocaleUrl::path($item->href()) }}"
+                                wire:navigate
                                 class="inline-flex items-center gap-1.5 text-sm font-semibold text-green-800 transition hover:text-green-600"
                             >
                                 {{ $item->localizedLabel() }}

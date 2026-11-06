@@ -155,6 +155,30 @@ class TranslationTest extends TestCase
         $this->assertSame('/about', $fields[3]['url']);
     }
 
+    public function test_an_overwrite_carries_a_changed_image_into_the_other_language(): void
+    {
+        // The editor replaced the photo in English; the other language must
+        // show the new one without a second upload, keeping its own words.
+        $target = ['content_blocks' => [
+            ['type' => 'section', 'data' => [
+                'layout' => 'split',
+                'fields' => [
+                    ['type' => 'title', 'value' => '[my] Our story'],
+                    ['type' => 'image', 'value' => 'https://example.com/old.jpg', 'alt' => 'Old alt'],
+                ],
+            ]],
+        ]];
+
+        $result = (new PageTranslator($this->fakeTranslator()))
+            ->translatePage($this->sourceState(), $target, 'en', 'my', overwrite: true);
+
+        $fields = array_values($result['state']['content_blocks'][0]['data']['fields']);
+
+        $this->assertSame('https://example.com/field.jpg', $fields[1]['value']);
+        $this->assertSame('Old alt', $fields[1]['alt'], 'The caption the locale wrote is kept.');
+        $this->assertSame('[my] Our story', $fields[0]['value']);
+    }
+
     public function test_a_section_of_another_kind_is_replaced_by_the_source_structure(): void
     {
         // Structure belongs to the source language: a destination section that

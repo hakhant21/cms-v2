@@ -67,6 +67,7 @@ class TranslatePageJob implements ShouldQueue
 
         $translated = 0;
         $failed = [];
+        $done = [];
 
         foreach ($this->into as $locale) {
             if ($locale === $this->from) {
@@ -90,11 +91,19 @@ class TranslatePageJob implements ShouldQueue
 
             $state[$locale] = $result['state'];
             $translated += $result['translated'];
+            $done[] = $locale;
         }
 
         // Writing the whole state back keeps the source and any untouched
         // language exactly as they were; only the targets change.
         PageTranslations::sync($page, $state);
+
+        // A language the machine just wrote is no longer hand-written: the
+        // next save may refresh it again. An explicit Translate run is how an
+        // editor hands a manual locale back to the machine.
+        if ($done !== []) {
+            $page->translations()->whereIn('locale', $done)->update(['is_manual' => false]);
+        }
 
         $title = $page->localizedTitle($this->from);
 

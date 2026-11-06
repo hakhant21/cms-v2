@@ -10,6 +10,7 @@ use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Utilities\Get;
 
@@ -153,11 +154,16 @@ final class Section extends AbstractBlockType
     /**
      * The editor components for one palette entry.
      *
+     * Every input is optional: the same section appears in each language tab,
+     * copied from the default language or filled by the machine translation,
+     * and a required field here would force the editor to fill it once per
+     * language — the very work the write-once workflow removes.
+     *
      * @return array<int, mixed>
      */
     public static function fieldComponents(?string $type): array
     {
-        return match ($type) {
+        return self::optional(match ($type) {
             'eyebrow' => [
                 TextInput::make('value')->label('Eyebrow')->required()->maxLength(120),
             ],
@@ -223,7 +229,7 @@ final class Section extends AbstractBlockType
                     ->columns(2)
                     ->columnSpanFull()
                     ->schema([
-                        TextInput::make('year')->label('Year')->required()->maxLength(24)->placeholder('2003'),
+                        TextInput::make('year')->label('Year')->maxLength(24)->placeholder('2003'),
                         Textarea::make('text')->label('Milestone Text')->rows(2),
                     ]),
             ],
@@ -267,7 +273,7 @@ final class Section extends AbstractBlockType
                     ->columns(2)
                     ->columnSpanFull()
                     ->schema([
-                        TextInput::make('title')->label('Item Title')->required()->maxLength(255),
+                        TextInput::make('title')->label('Item Title')->maxLength(255),
                         Textarea::make('text')->label('Item Text')->rows(2),
                     ]),
             ],
@@ -279,7 +285,7 @@ final class Section extends AbstractBlockType
                     ->collapsible()
                     ->columnSpanFull()
                     ->schema([
-                        Textarea::make('text')->label('Item')->rows(2)->required(),
+                        Textarea::make('text')->label('Item')->rows(2),
                     ]),
             ],
             'callout' => [
@@ -302,7 +308,7 @@ final class Section extends AbstractBlockType
                     ->columns(2)
                     ->columnSpanFull()
                     ->schema([
-                        TextInput::make('value')->label('Label')->required()->maxLength(120),
+                        TextInput::make('value')->label('Label')->maxLength(120),
                         TextInput::make('url')->label('Anchor')->placeholder('#physical')->maxLength(120),
                     ]),
             ],
@@ -314,12 +320,29 @@ final class Section extends AbstractBlockType
                     ->columns(2)
                     ->columnSpanFull()
                     ->schema([
-                        TextInput::make('value')->label('Value')->required()->maxLength(60)->placeholder('33%'),
-                        TextInput::make('title')->label('Label')->required()->maxLength(120),
+                        TextInput::make('value')->label('Value')->maxLength(60)->placeholder('33%'),
+                        TextInput::make('title')->label('Label')->maxLength(120),
                     ]),
             ],
             default => [],
-        };
+        });
+    }
+
+    /**
+     * Drop the required marks from the palette inputs.
+     *
+     * @param  array<int, mixed>  $components
+     * @return array<int, mixed>
+     */
+    private static function optional(array $components): array
+    {
+        foreach ($components as $component) {
+            if ($component instanceof Component && method_exists($component, 'required')) {
+                $component->required(false);
+            }
+        }
+
+        return $components;
     }
 
     /**

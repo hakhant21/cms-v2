@@ -16,6 +16,7 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
@@ -29,6 +30,10 @@ use Illuminate\Validation\Rules\Unique;
 /**
  * One form for the whole page: the locale-neutral details on top, then a tab
  * per language holding that language's title, summary, sections and SEO.
+ *
+ * The default language is the one an editor writes; on save the other
+ * languages are machine-translated from it unless they were written by hand.
+ * Their tabs stay editable for exactly that: wording typed there is kept.
  *
  * The section builder is driven by {@see BlockRegistry}, so a new block type
  * appears in the editor without touching this class.
@@ -106,6 +111,11 @@ class PageForm
                             ->numeric()
                             ->default(0)
                             ->helperText('Lower numbers appear first in lists.'),
+                        Toggle::make('auto_translate')
+                            ->label('Auto-translate on save')
+                            ->default(true)
+                            ->helperText('Write the default language once: saving translates it into the other languages in the background. Languages you edit by hand are kept as you wrote them.')
+                            ->columnSpanFull(),
                     ]),
                 Tabs::make('Translations')
                     ->columnSpanFull()
@@ -155,9 +165,12 @@ class PageForm
     /**
      * The active locales, each rendered as its own tab.
      *
-     * Sections are managed once, in the default language's tab: adding,
-     * removing, cloning or reordering there re-fits every other language in
-     * place, so an editor never deletes the same section three times.
+     * Sections are managed once, in whichever tab the editor happens to be
+     * working in: adding, removing, cloning or reordering there re-fits every
+     * other language in place — images included, so an upload happens once
+     * for the whole page. Words stay per-language, and every tab keeps its
+     * own, for editors who want to write a language themselves instead of
+     * letting the machine do it.
      *
      * @return array<int, Tab>
      */
@@ -172,12 +185,15 @@ class PageForm
                 ->schema([
                     TextInput::make("translations.{$code}.title")
                         ->label('Page title')
-                        ->maxLength(255),
+                        ->maxLength(255)
+                        ->placeholder($code === $primary ? null : 'Leave empty to translate from the default language'),
                     Textarea::make("translations.{$code}.excerpt")
                         ->label('Short summary')
                         ->rows(3)
-                        ->helperText('Shown on cards, and used as the default meta description.'),
-                    self::sectionsBuilder($code, $code === $primary ? $languages : null),
+                        ->helperText($code === $primary
+                            ? 'Shown on cards, and used as the default meta description.'
+                            : 'Leave empty to translate automatically, or write your own — what you type here is kept.'),
+                    self::sectionsBuilder($code, $languages),
                     Fieldset::make('Search engine listing')
                         ->columns(1)
                         ->schema([
@@ -209,48 +225,41 @@ class PageForm
     }
 
     /**
-     * The section builder for one language. In the default language it owns
-     * the page's structure and mirrors every change into the other tabs;
-     * elsewhere the sections only arrive from there, so a block is added,
-     * removed or reordered exactly once for the whole page.
+     * The section builder for one language. Structure is shared: a block
+     * added, removed, cloned or reordered in ANY tab is mirrored into every
+     * other tab, keeping the words each language already has. An editor
+     * therefore works in one language only — whichever they prefer — and
+     * never repeats the same change three times.
      *
-     * @param  array<string, string>|null  $syncInto  the locales this tab drives, null when another tab leads
+     * @param  array<string, string>  $languages  every locale this tab mirrors into
      */
-    private static function sectionsBuilder(string $code, ?array $syncInto): Builder
+    private static function sectionsBuilder(string $code, array $languages): Builder
     {
-        $builder = Builder::make("translations.{$code}.content_blocks")
+        return Builder::make("translations.{$code}.content_blocks")
             ->label('Page sections')
             ->blocks(fn (): array => self::blocks())
             ->blockNumbers(false)
             ->collapsible()
             ->cloneable()
             ->addActionLabel('Add section')
-            ->columnSpanFull();
-
-        if ($syncInto === null) {
-            return $builder
-                ->helperText('Sections are managed in the main language tab — here you only translate the words.')
-                ->disableItemCreation()
-                ->disableItemDeletion()
-                ->disableItemMovement();
-        }
-
-        return $builder
-            ->helperText('Add, remove or reorder sections here — every other language follows, keeping the words it already has.')
-            ->afterStateUpdated(function (mixed $state, Get $get, callable $set) use ($code, $syncInto): void {
+            ->columnSpanFull()
+            ->helperText('Add, remove or reorder sections here — every other language follows, keeping the words it already has. Images you upload here are used in every language. Only the wording is per-language: leave it to the automatic translation, or type your own — what you write is kept.')
+            ->afterStateUpdated(function (mixed $state, Get $get, callable $set) use ($code, $languages): void {
                 $canonical = is_array($state) ? $state : [];
 
-                foreach (array_keys($syncInto) as $other) {
+                foreach (array_keys($languages) as $other) {
                     if ($other === $code) {
                         continue;
                     }
 
                     $path = "translations.{$other}.content_blocks";
                     $current = is_array($get($path)) ? $get($path) : [];
-                    $aligned = BlockStructure::align($canonical, $current);
+                    $aligned = BlockStructure::mirror($canonical, $current);
 
-                    // Only write when the words really need re-fitting, so
-                    // typing here never disturbs the other tabs.
+                    // Only write when the structure really changed, so typing
+                    // words here never disturbs the other tabs — and the
+                    // mirrored tabs, whose own hooks fire in turn, settle
+                    // instead of bouncing the change back and forth.
                     if (json_encode(array_values($aligned)) !== json_encode(array_values($current))) {
                         $set($path, $aligned);
                     }

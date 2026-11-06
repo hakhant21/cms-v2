@@ -63,7 +63,7 @@
     </div>
 
     <div class="mx-auto flex min-h-20 max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
-        <a href="{{ locale_path('/') }}" class="flex items-center gap-2">
+        <a href="{{ locale_path('/') }}" wire:navigate class="flex items-center gap-2">
             <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-lime-300/95 shadow-lg shadow-lime-500/10">
                 <x-site.icon name="leaf" class="h-7 w-7 text-stone-950" />
             </span>
@@ -76,6 +76,7 @@
                 @if ($item->children->isEmpty())
                     <a
                         href="{{ $href }}"
+                        @if (! $item->opens_new_tab) wire:navigate @endif
                         @class([
                             'rounded-lg px-3 py-2 text-sm font-semibold transition',
                             'text-lime-300' => $isActive($item->href()),
@@ -97,7 +98,7 @@
                         </button>
                         <div class="absolute left-0 z-50 mt-1 hidden min-w-52 overflow-hidden rounded-xl border border-white/10 bg-stone-950/95 py-1 shadow-2xl backdrop-blur" data-dropdown-menu>
                             @foreach ($item->children as $child)
-                                <a href="{{ LocaleUrl::path($child->href()) }}" class="block px-4 py-2 text-sm text-stone-200 transition hover:bg-white/10 hover:text-lime-300">
+                                <a href="{{ LocaleUrl::path($child->href()) }}" wire:navigate class="block px-4 py-2 text-sm text-stone-200 transition hover:bg-white/10 hover:text-lime-300">
                                     {{ $child->localizedLabel() }}
                                 </a>
                             @endforeach
@@ -137,7 +138,7 @@
         <nav class="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8" aria-label="{{ $siteName }}">
             @foreach ($headerNav as $item)
                 @if ($item->children->isEmpty())
-                    <a href="{{ LocaleUrl::path($item->href()) }}" class="block rounded-lg px-3 py-2.5 text-sm font-semibold text-white/90 transition hover:bg-white/10 hover:text-lime-300">
+                    <a href="{{ LocaleUrl::path($item->href()) }}" wire:navigate class="block rounded-lg px-3 py-2.5 text-sm font-semibold text-white/90 transition hover:bg-white/10 hover:text-lime-300">
                         {{ $item->localizedLabel() }}
                     </a>
                 @else
@@ -148,7 +149,7 @@
                     </p>
 
                     @foreach ($item->children as $child)
-                        <a href="{{ LocaleUrl::path($child->href()) }}" class="block rounded-lg px-3 py-2 pl-6 text-sm font-medium text-stone-300 transition hover:bg-white/10 hover:text-lime-300">
+                        <a href="{{ LocaleUrl::path($child->href()) }}" wire:navigate class="block rounded-lg px-3 py-2 pl-6 text-sm font-medium text-stone-300 transition hover:bg-white/10 hover:text-lime-300">
                             {{ $child->localizedLabel() }}
                         </a>
                     @endforeach

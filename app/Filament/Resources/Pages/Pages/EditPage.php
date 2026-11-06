@@ -8,6 +8,7 @@ use App\Jobs\TranslatePageJob;
 use App\Models\Language;
 use App\Models\Page;
 use App\Support\PageTranslations;
+use App\Support\Translation\AutoTranslation;
 use App\Support\Translation\PageTranslator;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
@@ -24,6 +25,9 @@ class EditPage extends EditRecord
 
     /** @var array<string, array<string, mixed>> */
     protected array $translations = [];
+
+    /** The saved languages before this save, to spot hand-written edits. */
+    protected array $baseline = [];
 
     protected function getHeaderActions(): array
     {
@@ -61,7 +65,7 @@ class EditPage extends EditRecord
             ->color('gray')
             ->visible(fn (): bool => count($languages) > 1)
             ->modalHeading('Translate this page')
-            ->modalDescription('Save your changes first. The languages you choose are re-translated from the saved source in the background, and you will be notified when they are ready — no need to edit each tab.')
+            ->modalDescription('Save your changes first. The languages you choose are re-translated from the saved source in the background, and you will be notified when they are ready — no need to edit each tab. Languages you wrote by hand are included too: translating them hands them back to the machine.')
             ->modalSubmitActionLabel('Translate')
             ->schema([
                 Select::make('from')
@@ -161,6 +165,9 @@ class EditPage extends EditRecord
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
+        // The record still holds the previous save here, which is exactly the
+        // baseline the manual-edit detection needs.
+        $this->baseline = PageTranslations::state($this->record);
         $this->translations = PageTranslations::extract($data);
 
         return $data;
@@ -168,7 +175,7 @@ class EditPage extends EditRecord
 
     protected function afterSave(): void
     {
-        PageTranslations::sync($this->record, $this->translations);
+        AutoTranslation::save($this->record, $this->translations, $this->baseline);
         $this->record->reorderGallery(array_map('intval', (array) ($this->data['gallery'] ?? [])));
     }
 }
