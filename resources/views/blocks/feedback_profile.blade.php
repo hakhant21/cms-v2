@@ -6,7 +6,11 @@
     $farmer = $text('farmer_name');
     $location = $text('location');
     $quote = $text('quote');
-    $photo = media_url(is_string($data['photo'] ?? null) ? $data['photo'] : null);
+    /* An uploaded portrait wins; older profiles carry their farmer photo as
+       the page's featured image, so the detail page shows that instead of an
+       empty panel. */
+    $photo = media_url(is_string($data['photo'] ?? null) ? $data['photo'] : null)
+        ?? ($page ?? null)?->featuredImage?->url();
 
     $facts = array_values(array_filter([
         ['label' => 'Crop', 'value' => $text('crop')],

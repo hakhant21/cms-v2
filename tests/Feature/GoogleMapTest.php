@@ -47,7 +47,7 @@ class GoogleMapTest extends TestCase
             locale: 'en',
             latitude: 19.7616782,
             longitude: 96.2196115,
-            label: 'RUMA Organic Company',
+            label: 'RUMA Organic',
         );
 
         $embed = (string) $map->embedUrl();
@@ -61,7 +61,7 @@ class GoogleMapTest extends TestCase
         $this->assertStringContainsString('!4f13.1', $embed);
         // The colon in the place id is what Google expects, percent-encoded.
         $this->assertStringContainsString('%3A0x7e68357b00be8b21', $embed);
-        $this->assertStringContainsString('!2sRUMA%20Organic%20Company', $embed);
+        $this->assertStringContainsString('!2sRUMA%20Organic!', $embed);
         $this->assertStringContainsString('!2sMM', $embed);
     }
 

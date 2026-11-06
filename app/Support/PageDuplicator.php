@@ -31,6 +31,8 @@ final class PageDuplicator
                 'excerpt' => $translation->excerpt,
                 'content_blocks' => $translation->content_blocks,
                 'seo' => $translation->seo,
+                // A language written by hand stays protected on the copy.
+                'is_manual' => $translation->is_manual,
             ]);
         }
 

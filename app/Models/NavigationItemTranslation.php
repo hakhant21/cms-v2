@@ -9,7 +9,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class NavigationItemTranslation extends Model
 {
     /** @var list<string> */
-    protected $fillable = ['navigation_item_id', 'locale', 'label'];
+    protected $fillable = ['navigation_item_id', 'locale', 'label', 'is_manual'];
+
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'is_manual' => 'boolean',
+        ];
+    }
 
     public function item(): BelongsTo
     {

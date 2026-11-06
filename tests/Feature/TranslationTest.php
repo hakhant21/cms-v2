@@ -8,6 +8,7 @@ use App\Models\Language;
 use App\Models\Page;
 use App\Models\PageTranslation;
 use App\Models\User;
+use App\Support\BlockStructure;
 use App\Support\Translation\GeminiTranslator;
 use App\Support\Translation\PageTranslator;
 use App\Support\Translation\TranslationFailed;
@@ -218,6 +219,151 @@ class TranslationTest extends TestCase
             'Write to us',
             $result['state']['content_blocks'][0]['data']['title'],
         );
+    }
+
+    public function test_every_section_word_travels_captions_callouts_and_row_labels(): void
+    {
+        // The palette's prose that used to be skipped: the globe caption, the
+        // callout, and the labels inside list, stats and pill rows. Each is
+        // typed once in the default language and must arrive translated —
+        // while years, values and anchors travel as the settings they are.
+        $source = ['content_blocks' => [['type' => 'section', 'data' => [
+            'layout' => 'soil_dimension',
+            'fields' => [
+                ['type' => 'globe', 'value' => 'Greener across continents'],
+                ['type' => 'callout', 'value' => 'Why it works', 'text' => 'Because soil lives', 'items' => [
+                    ['text' => 'Better roots'],
+                ]],
+                ['type' => 'list', 'items' => [
+                    ['title' => 'Humate', 'text' => 'Feeds the soil'],
+                ]],
+                ['type' => 'stats', 'items' => [
+                    ['value' => '33%', 'title' => 'More yield'],
+                ]],
+                ['type' => 'pills', 'items' => [
+                    ['value' => 'Physical', 'url' => '#physical'],
+                ]],
+                ['type' => 'milestones', 'items' => [
+                    ['year' => '2003', 'text' => 'Founded'],
+                ]],
+            ],
+        ]]]];
+
+        $result = (new PageTranslator($this->fakeTranslator()))
+            ->translatePage($source, [], 'en', 'my');
+
+        $fields = array_values($result['state']['content_blocks'][0]['data']['fields']);
+
+        $this->assertSame('[my] Greener across continents', $fields[0]['value']);
+        $this->assertSame('[my] Why it works', $fields[1]['value']);
+        $this->assertSame('[my] Because soil lives', $fields[1]['text']);
+        $this->assertSame('[my] Better roots', $fields[1]['items'][0]['text']);
+        $this->assertSame('[my] Humate', $fields[2]['items'][0]['title']);
+        $this->assertSame('[my] Feeds the soil', $fields[2]['items'][0]['text']);
+        $this->assertSame('33%', $fields[3]['items'][0]['value'], 'A number is structure, not a sentence.');
+        $this->assertSame('[my] More yield', $fields[3]['items'][0]['title']);
+        $this->assertSame('[my] Physical', $fields[4]['items'][0]['value']);
+        $this->assertSame('#physical', $fields[4]['items'][0]['url']);
+        $this->assertSame('2003', $fields[5]['items'][0]['year']);
+        $this->assertSame('[my] Founded', $fields[5]['items'][0]['text']);
+    }
+
+    public function test_faq_and_feedback_words_travel_and_survive_an_overwrite(): void
+    {
+        // Non-section blocks keep their prose under their own keys: an FAQ's
+        // question and answer, a farmer profile's name, quote and result
+        // rows. None of them may be copied over in English, and an overwrite
+        // must keep the translated rows while following the source's count.
+        $source = ['content_blocks' => [
+            ['type' => 'faq_item', 'data' => [
+                'question' => 'Is it organic?',
+                'answer' => 'Yes, certified',
+                'context' => 'test-results',
+            ]],
+            ['type' => 'feedback_profile', 'data' => [
+                'farmer_name' => 'U Myint Shwe',
+                'quote' => 'It saved my crop',
+                'photo' => 'feedback/farmer.jpg',
+                'proven_results' => [
+                    ['value' => 'Fast greening'],
+                    ['value' => 'Strong recovery'],
+                ],
+            ]],
+        ]];
+
+        $target = ['content_blocks' => [
+            ['type' => 'faq_item', 'data' => [
+                'question' => 'အော်ဂဲနစ် ဖြစ်ပါသလား။',
+                'answer' => 'ဟုတ်ပါသည်',
+                'context' => 'test-results',
+            ]],
+            ['type' => 'feedback_profile', 'data' => [
+                'farmer_name' => 'ဦးမြင့်ရွှေ',
+                'quote' => 'ကျွန်တော့်သီးနှံကို ကယ်တင်ခဲ့သည်',
+                'photo' => 'feedback/farmer.jpg',
+                'proven_results' => [
+                    ['value' => 'အမြန် စိမ်းလန်းလာသည်'],
+                ],
+            ]],
+        ]];
+
+        $result = (new PageTranslator($this->fakeTranslator()))
+            ->translatePage($source, $target, 'en', 'my', overwrite: true);
+
+        [$faq, $profile] = $result['state']['content_blocks'];
+
+        $this->assertSame('[my] Is it organic?', $faq['data']['question']);
+        $this->assertSame('[my] Yes, certified', $faq['data']['answer']);
+        $this->assertSame('test-results', $faq['data']['context'], 'The accordion context is a setting, not a sentence.');
+
+        $this->assertSame('[my] U Myint Shwe', $profile['data']['farmer_name']);
+        $this->assertSame('[my] It saved my crop', $profile['data']['quote']);
+        $this->assertSame('feedback/farmer.jpg', $profile['data']['photo']);
+
+        // An overwrite is the machine's refresh: every row is re-translated
+        // and the row the source added arrives too, so the count follows the
+        // source. (Hand-written languages never reach this path — they are
+        // excluded before the job is queued.)
+        $rows = array_values($profile['data']['proven_results']);
+        $this->assertCount(2, $rows);
+        $this->assertSame('[my] Fast greening', $rows[0]['value']);
+        $this->assertSame('[my] Strong recovery', $rows[1]['value']);
+    }
+
+    public function test_a_hand_written_feedback_profile_keeps_its_words_when_structure_syncs(): void
+    {
+        // The editor's own sync (not an overwrite): the Burmese profile keeps
+        // every word it wrote while the structure follows the English one —
+        // the new photo and the extra result row arrive, the prose stays.
+        $source = ['type' => 'feedback_profile', 'data' => [
+            'farmer_name' => 'U Myint Shwe',
+            'quote' => 'It saved my crop',
+            'photo' => 'feedback/new.jpg',
+            'proven_results' => [
+                ['value' => 'Fast greening'],
+                ['value' => 'Strong recovery'],
+            ],
+        ]];
+
+        $target = ['type' => 'feedback_profile', 'data' => [
+            'farmer_name' => 'ဦးမြင့်ရွှေ',
+            'quote' => 'ကျွန်တော့်သီးနှံကို ကယ်တင်ခဲ့သည်',
+            'photo' => 'feedback/old.jpg',
+            'proven_results' => [
+                ['value' => 'အမြန် စိမ်းလန်းလာသည်'],
+            ],
+        ]];
+
+        $mirrored = BlockStructure::mirror([$source], [$target])[0];
+
+        $this->assertSame('ဦးမြင့်ရွှေ', $mirrored['data']['farmer_name']);
+        $this->assertSame('ကျွန်တော့်သီးနှံကို ကယ်တင်ခဲ့သည်', $mirrored['data']['quote']);
+        $this->assertSame('feedback/new.jpg', $mirrored['data']['photo'], 'The photo is structure: one upload reaches every language.');
+
+        $rows = array_values($mirrored['data']['proven_results']);
+        $this->assertCount(2, $rows);
+        $this->assertSame('အမြန် စိမ်းလန်းလာသည်', $rows[0]['value']);
+        $this->assertSame('Strong recovery', $rows[1]['value'], 'A brand-new row arrives in the source language, ready to translate.');
     }
 
     public function test_the_service_receives_one_batch_and_answers_in_order(): void

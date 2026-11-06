@@ -27,6 +27,34 @@ class BlockStructure
         'description',
         'caption',
         'button_label',
+        // FAQ pages: the question and its rich answer are the whole block.
+        'question',
+        'answer',
+        // Farmer feedback profiles: every word the card shows.
+        'farmer_name',
+        'location',
+        'quote',
+        'crops_grown',
+        'crop',
+        'crop_variety',
+        'acreage',
+        'field_challenge',
+        'treatment',
+        'other_crop_details',
+        'previous_year_yield',
+        'ruma_field_yield',
+    ];
+
+    /**
+     * Row lists outside a section whose rows hold prose under a known key
+     * (feedback results and benefits). The rows belong to the locale; only
+     * their count and order follow the source.
+     *
+     * @var array<string, string>
+     */
+    public const ROW_PROSE_KEYS = [
+        'proven_results' => 'value',
+        'key_benefits' => 'value',
     ];
 
     /** Field keys that hold an address or a setting, never a sentence. */
@@ -154,9 +182,22 @@ class BlockStructure
             // Outside sections the prose sits under a handful of known keys;
             // everything else (video urls, map settings, ...) is structure.
             foreach ($sourceData as $key => $value) {
-                if (! in_array($key, self::PROSE_KEYS, true)) {
-                    $data[$key] = $value;
+                if (in_array($key, self::PROSE_KEYS, true)) {
+                    continue;
                 }
+
+                // Prose row lists keep the locale's own rows, trimmed to the
+                // source's count, with fresh rows arriving ready to translate.
+                if (isset(self::ROW_PROSE_KEYS[$key])) {
+                    $data[$key] = self::mergeProseRows(
+                        is_array($value) ? $value : [],
+                        is_array($data[$key] ?? null) ? $data[$key] : [],
+                    );
+
+                    continue;
+                }
+
+                $data[$key] = $value;
             }
 
             $source['data'] = $data;
@@ -316,6 +357,26 @@ class BlockStructure
         }
 
         return $keep;
+    }
+
+    /**
+     * The target's prose rows in the source's count and order: rows beyond
+     * the source list are dropped, and rows the source added arrive whole.
+     *
+     * @param  array<array-key, mixed>  $sourceRows
+     * @param  array<array-key, mixed>  $targetRows
+     * @return array<int, mixed>
+     */
+    private static function mergeProseRows(array $sourceRows, array $targetRows): array
+    {
+        $sourceRows = array_values($sourceRows);
+        $rows = array_slice(array_values($targetRows), 0, count($sourceRows));
+
+        for ($index = count($rows); $index < count($sourceRows); $index++) {
+            $rows[] = $sourceRows[$index];
+        }
+
+        return $rows;
     }
 
     /**

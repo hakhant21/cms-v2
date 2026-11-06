@@ -16,7 +16,7 @@ class SettingSeeder extends Seeder
     {
         $defaults = [
             'company' => [
-                'company.name' => 'RUMA Organic Company',
+                'company.name' => 'RUMA Organic',
                 'company.email' => 'rumaorganic@rumaorg.com',
                 'company.phone' => '09777538777',
                 'company.phone_secondary' => '09781267752',

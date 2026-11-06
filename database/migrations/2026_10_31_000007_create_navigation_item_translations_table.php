@@ -4,7 +4,11 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-/** The visible label of a navigation item, one row per locale. */
+/**
+ * The visible label of a navigation item, one row per locale. Rows the
+ * editor wrote by hand are flagged `is_manual`; the rest are machine-owned
+ * and refreshed automatically whenever the label changes.
+ */
 return new class extends Migration
 {
     public function up(): void
@@ -15,6 +19,7 @@ return new class extends Migration
             $table->foreignId('navigation_item_id')->constrained()->cascadeOnDelete();
             $table->string('locale', 8);
             $table->string('label');
+            $table->boolean('is_manual')->default(false);
 
             $table->timestamps();
 

@@ -70,7 +70,7 @@ class NavigationItemForm
                 Repeater::make('translations')
                     ->relationship()
                     ->label('Labels')
-                    ->helperText('The text visitors see, per language.')
+                    ->helperText('Write the label once, in any one language — the other languages are translated automatically when you save. Only add a row here for a language you want to write yourself; what you type there is kept.')
                     ->columns(2)
                     ->defaultItems(1)
                     ->itemLabel(fn (array $state): string => self::languageLabel((string) ($state['locale'] ?? '')))
@@ -78,6 +78,8 @@ class NavigationItemForm
                         Select::make('locale')
                             ->label('Language')
                             ->options(self::languages())
+                            ->default(Language::defaultCode())
+                            ->distinct()
                             ->required(),
                         TextInput::make('label')->label('Label')->required()->maxLength(120),
                     ])

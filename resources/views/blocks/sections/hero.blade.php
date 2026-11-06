@@ -14,7 +14,7 @@
                 @continue (($field['type'] ?? '') === 'globe')
                 <div class="mt-6 first:mt-0" data-reveal style="--reveal-delay: {{ min($position, 5) * 90 }}ms">
                     @if (($field['type'] ?? '') === 'title')
-                        <h1 class="text-4xl font-bold text-balance text-white sm:text-5xl lg:text-6xl">
+                        <h1 class="text-3xl font-bold text-balance text-white sm:text-4xl lg:text-5xl">
                             {{ $field['value'] ?? '' }}
                         </h1>
                     @else

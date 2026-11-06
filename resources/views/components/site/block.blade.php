@@ -1,4 +1,4 @@
-@props(['block'])
+@props(['block', 'page' => null])
 
 @php
     $type = is_array($block) ? ($block['type'] ?? null) : null;
@@ -8,5 +8,5 @@
 @endphp
 
 @if ($known)
-    @include($view, ['data' => is_array($data) ? $data : [], 'block' => $block])
+    @include($view, ['data' => is_array($data) ? $data : [], 'block' => $block, 'page' => $page])
 @endif

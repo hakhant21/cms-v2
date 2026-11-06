@@ -11,8 +11,8 @@
         <div class="grid grid-cols-1 gap-10 md:grid-cols-3">
             <div class="space-y-4">
                 <div class="flex items-center gap-2">
-                    <span class="flex h-10 w-10 items-center justify-center rounded-2xl bg-lime-300">
-                        <x-site.icon name="leaf" class="h-6 w-6 text-stone-950" />
+                    <span class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-2xl bg-white">
+                        <img src="/logo-mark.png" alt="" class="h-full w-full object-contain" width="40" height="40">
                     </span>
                     <span class="text-lg font-black text-white">{{ $siteName }}</span>
                 </div>

@@ -9,6 +9,7 @@ use App\Models\Language;
 use App\Models\Page;
 use App\Support\BlockStructure;
 use App\Support\Text;
+use Closure;
 use Filament\Forms\Components\Builder;
 use Filament\Forms\Components\Builder\Block as BuilderBlock;
 use Filament\Forms\Components\DateTimePicker;
@@ -209,14 +210,17 @@ class PageForm
                                 ->image()
                                 ->disk('public')
                                 ->directory('seo')
-                                ->visibility('public'),
+                                ->visibility('public')
+                                ->helperText('Uploaded once, in any language — every tab follows.')
+                                ->afterStateUpdated(self::mirrorToOtherTabs("translations.{$code}.seo.og_image", $code, $languages)),
                             Select::make("translations.{$code}.seo.robots")
                                 ->label('Search engines')
                                 ->options([
                                     'index,follow' => 'Index this page',
                                     'noindex,follow' => 'Hide from search results',
                                 ])
-                                ->placeholder('Index this page'),
+                                ->placeholder('Index this page')
+                                ->afterStateUpdated(self::mirrorToOtherTabs("translations.{$code}.seo.robots", $code, $languages)),
                         ]),
                 ]);
         }
@@ -265,6 +269,31 @@ class PageForm
                     }
                 }
             });
+    }
+
+    /**
+     * Copy one language-neutral value — the share image, the search-engine
+     * choice — from the tab it was changed in into every other tab, so it is
+     * set once for the whole page. Only written where it actually differs,
+     * so the tabs settle instead of bouncing the value around.
+     *
+     * @param  array<string, string>  $languages
+     */
+    private static function mirrorToOtherTabs(string $path, string $code, array $languages): Closure
+    {
+        return function (mixed $state, Get $get, callable $set) use ($path, $code, $languages): void {
+            foreach (array_keys($languages) as $other) {
+                if ($other === $code) {
+                    continue;
+                }
+
+                $target = "translations.{$other}.".substr($path, strlen("translations.{$code}."));
+
+                if (json_encode($get($target)) !== json_encode($state)) {
+                    $set($target, $state);
+                }
+            }
+        };
     }
 
     /**

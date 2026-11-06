@@ -193,6 +193,24 @@ class PageStructureSyncTest extends TestCase
             ->assertSet('data.translations.my.content_blocks', fn (mixed $blocks): bool => $this->valueAt((array) $blocks, 0) === 'ကိုယ်တိုင်ရေးသော ခေါင်းစဉ်');
     }
 
+    public function test_a_share_image_uploaded_in_one_tab_lands_in_every_tab(): void
+    {
+        // The share image belongs to the page, not to a language: uploading it
+        // in ANY tab — here Burmese — must show in every other tab. The
+        // FileUpload keys its raw state by uuid, so compare the paths.
+        $this->editor()
+            ->set('data.translations.my.seo.og_image', ['11111111-1111-1111-1111-111111111111' => 'seo/share.jpg'])
+            ->assertSet('data.translations.en.seo.og_image', fn (mixed $state): bool => is_array($state)
+                && in_array('seo/share.jpg', array_values($state), true));
+    }
+
+    public function test_the_search_engine_choice_made_in_one_tab_applies_to_every_tab(): void
+    {
+        $this->editor()
+            ->set('data.translations.en.seo.robots', 'noindex,follow')
+            ->assertSet('data.translations.my.seo.robots', 'noindex,follow');
+    }
+
     /** @return Testable */
     private function editor(): mixed
     {

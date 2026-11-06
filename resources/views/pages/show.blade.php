@@ -98,7 +98,7 @@
 
         @foreach ($blocks as $index => $block)
             @continue($projectIntro !== null && $index === 0)
-            <x-site.block :block="$block" />
+            <x-site.block :block="$block" :page="$page" />
         @endforeach
     @endif
 

@@ -16,6 +16,36 @@ use App\Support\SectionData;
  */
 final class PageTranslator
 {
+    /**
+     * Section field types whose `value` is a visible sentence: the text
+     * types plus the button label, the globe caption and the callout title.
+     * Their companions (the button url, ...) are addresses and travel as is.
+     *
+     * @var array<int, string>
+     */
+    private const VALUE_TYPES = [
+        ...SectionData::TEXT_TYPES,
+        'button',
+        'globe',
+        'callout',
+    ];
+
+    /**
+     * The prose each row of a list-shaped section field carries, by field
+     * type. Everything else on the row (years, anchors, stat values) is a
+     * setting or a number and travels untouched.
+     *
+     * @var array<string, array<int, string>>
+     */
+    private const ROW_TEXT_KEYS = [
+        'list' => ['title', 'text'],
+        'milestones' => ['text'],
+        'checklist' => ['text'],
+        'stats' => ['title'],
+        'pills' => ['value'],
+        'callout' => ['text'],
+    ];
+
     public function __construct(private readonly Translator $translator) {}
 
     /** Whether the underlying translation service can run at all. */
@@ -186,27 +216,31 @@ final class PageTranslator
 
                 $type = (string) ($field['type'] ?? '');
 
-                // A button's value is its visible label — prose like the text
-                // types — while the url beside it is an address and travels
-                // untouched.
-                if (in_array($type, SectionData::TEXT_TYPES, true) || $type === 'button') {
+                if (in_array($type, self::VALUE_TYPES, true)) {
                     $value = $field['value'] ?? null;
 
                     if (is_string($value) && trim($value) !== '') {
                         $texts["data.fields.{$index}.value"] = trim($value);
                     }
-
-                    continue;
                 }
 
-                if (in_array($type, SectionData::LIST_TYPES, true)) {
+                // The callout carries a second sentence beside its title.
+                if ($type === 'callout') {
+                    $text = $field['text'] ?? null;
+
+                    if (is_string($text) && trim($text) !== '') {
+                        $texts["data.fields.{$index}.text"] = trim($text);
+                    }
+                }
+
+                foreach (self::ROW_TEXT_KEYS[$type] ?? [] as $rowKey) {
                     $rows = is_array($field['items'] ?? null) ? $field['items'] : [];
 
                     foreach ($rows as $row => $item) {
-                        $text = is_array($item) ? ($item['text'] ?? null) : null;
+                        $text = is_array($item) ? ($item[$rowKey] ?? null) : null;
 
                         if (is_string($text) && trim($text) !== '') {
-                            $texts["data.fields.{$index}.items.{$row}.text"] = trim($text);
+                            $texts["data.fields.{$index}.items.{$row}.{$rowKey}"] = trim($text);
                         }
                     }
                 }
@@ -220,6 +254,18 @@ final class PageTranslator
 
             if (is_string($value) && trim($value) !== '') {
                 $texts["data.{$key}"] = trim($value);
+            }
+        }
+
+        foreach (BlockStructure::ROW_PROSE_KEYS as $key => $rowKey) {
+            $rows = is_array($data[$key] ?? null) ? $data[$key] : [];
+
+            foreach ($rows as $row => $item) {
+                $text = is_array($item) ? ($item[$rowKey] ?? null) : null;
+
+                if (is_string($text) && trim($text) !== '') {
+                    $texts["data.{$key}.{$row}.{$rowKey}"] = trim($text);
+                }
             }
         }
 

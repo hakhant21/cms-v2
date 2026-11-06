@@ -2025,15 +2025,11 @@
                                 "fields": [
                                     {
                                         "type": "eyebrow",
-                                        "value": "Why Choose Us"
+                                        "value": "About Us"
                                     },
                                     {
                                         "type": "title",
-                                        "value": "A New Era in Plant Science"
-                                    },
-                                    {
-                                        "type": "paragraph",
-                                        "value": "Biological activators that awaken the plant’s natural genetic potential — not ordinary fertilizers."
+                                        "value": "About RUMA Organic"
                                     },
                                     {
                                         "type": "globe",
@@ -2049,19 +2045,53 @@
                                 "fields": [
                                     {
                                         "type": "title",
-                                        "value": "The Ruma Organic point of view"
-                                    },
-                                    {
-                                        "type": "profile",
-                                        "value": "Ruma Organic is an agricultural technology company connecting Russian agronomy with Myanmar field knowledge. We develop and support practical crop nutrition programs for farmers, distributors, and agricultural partners."
+                                        "value": "Our Mission & Vision"
                                     },
                                     {
                                         "type": "mission",
-                                        "value": "Make reliable agricultural innovation understandable, usable, and relevant to the farms that need it."
+                                        "value": "To empower Myanmar agriculture through high-quality seeds, Humic-based organic fertilizers, and soil-restoration solutions developed through Russian–Myanmar cooperation and agricultural expertise."
                                     },
                                     {
                                         "type": "vision",
-                                        "value": "Healthier soils, stronger crops, and resilient farm businesses across every growing region we serve."
+                                        "value": "To build a healthier and more sustainable agriculture where farmers prosper, people have access to healthier food, and fertile soil is preserved for generations to come."
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "type": "section",
+                            "data": {
+                                "layout": "plain",
+                                "fields": [
+                                    {
+                                        "type": "title",
+                                        "value": "We are committed to"
+                                    },
+                                    {
+                                        "type": "checklist",
+                                        "items": [
+                                            {
+                                                "text": "Improving soil health by restoring essential nutrients and supporting a healthy soil environment."
+                                            },
+                                            {
+                                                "text": "Providing farmers with high-quality seeds and effective agricultural solutions to improve crop quality, productivity, and profitability."
+                                            },
+                                            {
+                                                "text": "Promoting responsible and sustainable agricultural practices that protect soil and natural resources."
+                                            },
+                                            {
+                                                "text": "Supporting farmers in achieving better yields, better income, and a better quality of life."
+                                            },
+                                            {
+                                                "text": "Contributing to a healthier food system for Myanmar communities."
+                                            },
+                                            {
+                                                "text": "Bringing together Russian agricultural technology and Myanmar agricultural knowledge to create practical solutions for local farmers."
+                                            },
+                                            {
+                                                "text": "Building long-term partnerships with farmers, agricultural professionals, businesses, and communities to create shared value across the agricultural sector."
+                                            }
+                                        ]
                                     }
                                 ]
                             }
@@ -2114,11 +2144,40 @@
                         {
                             "type": "section",
                             "data": {
-                                "layout": "plain",
+                                "layout": "grid",
                                 "fields": [
                                     {
-                                        "type": "rich_text",
-                                        "value": "<h2>The Science Behind Our Success</h2><p>Our stimulants are powered by high-activity humic complexes enhanced with functional bio-additives that chemically bond with humic molecules. This innovation allows precise management of plant physiology, promoting faster germination and root growth, stronger stems and leaves, more abundant flowering and fruiting, and improved resilience against heat, drought, and disease stress.</p><p>Each liter contains 30–40 grams of active substances, yet its power lies not in nutrition but in bio-signaling — sending molecular messages that activate the plant’s hormonal and genetic systems.</p><p>At Ruma Organic we bring the most advanced Russian technology in humic and fulvic acid stimulants, derived from unique peat deposits found only in Russia — the richest source of natural bioactive substances on Earth.</p>"
+                                        "type": "title",
+                                        "value": "Core Values"
+                                    },
+                                    {
+                                        "type": "list",
+                                        "items": [
+                                            {
+                                                "title": "Farmer First",
+                                                "text": "We put farmers at the heart of everything we do, focusing on practical solutions that improve productivity, profitability, and quality of life."
+                                            },
+                                            {
+                                                "title": "Soil Health",
+                                                "text": "We believe healthy soil is the foundation of healthy crops, healthy food, and sustainable agriculture."
+                                            },
+                                            {
+                                                "title": "Quality & Integrity",
+                                                "text": "We are committed to delivering reliable products, maintaining high standards, and doing business with honesty and responsibility."
+                                            },
+                                            {
+                                                "title": "Innovation & Knowledge",
+                                                "text": "We connect agricultural knowledge, technology, and practical experience to develop better solutions for Myanmar agriculture."
+                                            },
+                                            {
+                                                "title": "Sustainability",
+                                                "text": "We work to protect soil, natural resources, and agricultural productivity for the benefit of present and future generations."
+                                            },
+                                            {
+                                                "title": "Partnership & Shared Prosperity",
+                                                "text": "We believe agriculture grows stronger when farmers, businesses, professionals, and communities grow together."
+                                            }
+                                        ]
                                     }
                                 ]
                             }
@@ -2130,26 +2189,22 @@
                                 "fields": [
                                     {
                                         "type": "title",
-                                        "value": "The Power of Synergy"
+                                        "value": "Our Teams"
                                     },
                                     {
                                         "type": "list",
                                         "items": [
                                             {
-                                                "title": "Higher productivity",
-                                                "text": "Yield increases up to +70% — beyond the sum of individual treatments."
+                                                "title": "Oleg",
+                                                "text": "Director of RUMA Organic"
                                             },
                                             {
-                                                "title": "Stronger immunity and stress tolerance",
-                                                "text": "Plants hold up better against heat, drought, flooding and disease pressure."
+                                                "title": "U Thurein Oo",
+                                                "text": "General Manager"
                                             },
                                             {
-                                                "title": "Reduced pesticide use by 30–50%",
-                                                "text": "Healthier plants need fewer protective sprays through the season."
-                                            },
-                                            {
-                                                "title": "Healthier soil, export-quality crops",
-                                                "text": "Organic matter and humic compounds build the soil while improving crop quality."
+                                                "title": "Daw Khin Thida Nyein",
+                                                "text": "Senior Product Manager"
                                             }
                                         ]
                                     }
@@ -2162,8 +2217,19 @@
                                 "layout": "plain",
                                 "fields": [
                                     {
-                                        "type": "rich_text",
-                                        "value": "<h2>Why Ruma Technology Matters</h2><p>Our mission is not just to sell products — we transfer Russian scientific excellence into the heart of Southeast Asian agriculture. By localizing production in Nay Pyi Taw (opening 2026), we will make world-class bio-stimulants affordable and accessible for every Myanmar farmer. Ruma Organic — bridging science, soil, and sustainability.</p><h2>Plant and Showroom</h2><p>The Ruma Organic plant — built with Russian technology and Myanmar cooperation — will open in December 2026 with an annual capacity of 12 million liters. Affordable inputs for farmers: foliar stimulants around 15,000 MMK per acre and organic fertilizers around 5,000 MMK per liter.</p><p>Expected impact: +$2 billion export potential and +20% national yield increase — a project under the attention of both Russia and Myanmar leadership, driving sustainable economic growth and farmer prosperity.</p>"
+                                        "type": "title",
+                                        "value": "Our Partners"
+                                    },
+                                    {
+                                        "type": "list",
+                                        "items": [
+                                            {
+                                                "title": "NAS"
+                                            },
+                                            {
+                                                "title": "MSG"
+                                            }
+                                        ]
                                     }
                                 ]
                             }
@@ -2204,15 +2270,11 @@
                                 "fields": [
                                     {
                                         "type": "eyebrow",
-                                        "value": "ဘာကြောင့် ကျွန်ုပ်တို့ကို ရွေးချယ်သင့်သနည်း"
+                                        "value": "ကျွန်ုပ်တို့အကြောင်း"
                                     },
                                     {
                                         "type": "title",
-                                        "value": "အပင်သိပ္ပံပညာ၏ ခေတ်သစ်"
-                                    },
-                                    {
-                                        "type": "paragraph",
-                                        "value": "သာမန်မြေသြဇာများ မဟုတ်ဘဲ အပင်၏ သဘာဝမျိုးရိုးဗီဇဆိုင်ရာ စွမ်းဆောင်ရည်များကို နိုးကြားစေသော ဇီဝဆိုင်ရာ တက်ကြွစေသည့်ပစ္စည်းများ။"
+                                        "value": "RUMA Organic အကြောင်း"
                                     },
                                     {
                                         "type": "globe",
@@ -2228,19 +2290,53 @@
                                 "fields": [
                                     {
                                         "type": "title",
-                                        "value": "Ruma Organic ၏ အမြင်သဘောထား"
-                                    },
-                                    {
-                                        "type": "profile",
-                                        "value": "Ruma Organic is an agricultural technology company connecting Russian agronomy with Myanmar field knowledge. We develop and support practical crop nutrition programs for farmers, distributors, and agricultural partners."
+                                        "value": "ကျွန်ုပ်တို့၏ ရည်ရွယ်ချက်နှင့် အမြင်"
                                     },
                                     {
                                         "type": "mission",
-                                        "value": "ယုံကြည်စိတ်ချရသော စိုက်ပျိုးရေးဆန်းသစ်တီထွင်မှုများကို လိုအပ်နေသည့် စိုက်ပျိုးခင်းများအတွက် နားလည်လွယ်ကူစေရန်၊ လက်တွေ့အသုံးချနိုင်ရန်နှင့် သင့်လျော်ကိုက်ညီမှုရှိစေရန် ဖန်တီးပေးခြင်း။"
+                                        "value": "ရုရှား–မြန်မာ ပူးပေါင်းဆောင်ရွက်မှုနှင့် စိုက်ပျိုးရေး ကျွမ်းကျင်ပညာတို့မှတစ်ဆင့် ဖော်ထုတ်ထားသော အရည်အသွေးမြင့် မျိုးစေ့များ၊ ဟူးမစ်အခြေခံ ဩဂဲနစ်မြေသြဇာများနှင့် မြေဆီလွှာ ပြန်လည်ထူထောင်ရေး ဖြေရှင်းချက်များဖြင့် မြန်မာ့စိုက်ပျိုးရေးကို စွမ်းအားဖြည့်တင်ပေးရန်။"
                                     },
                                     {
                                         "type": "vision",
-                                        "value": "ကျွန်ုပ်တို့ ဝန်ဆောင်မှုပေးနေသည့် စိုက်ပျိုးရေးဒေသများအားလုံးတွင် ပိုမိုကောင်းမွန်ကျန်းမာသော မြေဆီလွှာများ၊ ပိုမိုသန်မာသော သီးနှံများနှင့် ရေရှည်ရပ်တည်နိုင်သော စိုက်ပျိုးရေးလုပ်ငန်းများ ပေါ်ထွန်းလာစေရန်။"
+                                        "value": "တောင်သူများ ဝင်ငွေတိုးတက်ပြီး လူနေမှုဘဝ ပိုမိုကောင်းမွန်လာစေရန်၊ ပြည်သူများအတွက် ပိုမိုကျန်းမာရေးနှင့်ညီညွတ်သော အစားအစာများ ရရှိနိုင်စေရန်နှင့် နောင်လာနောက်သားများအတွက် မြေဆီသြဇာပြည့်ဝပြီး ကျန်းမာသော ရေမြေများကို ထိန်းသိမ်းလက်ဆင့်ကမ်းနိုင်စေရန် ရေရှည် တည်တံ့သော စိုက်ပျိုးရေးကို တည်ဆောက်ရန်။"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "type": "section",
+                            "data": {
+                                "layout": "plain",
+                                "fields": [
+                                    {
+                                        "type": "title",
+                                        "value": "ကျွန်ုပ်တို့ ကတိကဝတ်ပြုထားသည်များ"
+                                    },
+                                    {
+                                        "type": "checklist",
+                                        "items": [
+                                            {
+                                                "text": "မြေဆီလွှာတွင် မရှိမဖြစ်လိုအပ်သော အာဟာရဓာတ်များကို ပြန်လည်ဖြည့်တင်းပေးခြင်းနှင့် ကျန်းမာသော မြေဆီလွှာပတ်ဝန်းကျင်ကို ပံ့ပိုးပေးခြင်းဖြင့် မြေဆီလွှာကျန်းမာရေးကို တိုးတက်စေရန်။"
+                                            },
+                                            {
+                                                "text": "သီးနှံအရည်အသွေး၊ ထွက်နှုန်းနှင့် အမြတ်အစွန်း တိုးတက်စေရန် တောင်သူများအတွက် အရည်အသွေးမြင့် မျိုးစေ့များနှင့် ထိရောက်သော စိုက်ပျိုးရေးဖြေရှင်းချက်များကို ပေးအပ်ရန်။"
+                                            },
+                                            {
+                                                "text": "မြေဆီလွှာနှင့် သဘာဝအရင်းအမြစ်များကို ကာကွယ်သည့် တာဝန်ယူမှုရှိပြီး ရေရှည်တည်တံ့သော စိုက်ပျိုးရေးလက်တွေ့များကို မြှင့်တင်ရန်။"
+                                            },
+                                            {
+                                                "text": "တောင်သူများအနေဖြင့် အထွက်နှုန်းပိုကောင်းရန်၊ ဝင်ငွေပိုကောင်းရန်နှင့် လူနေမှုဘဝ ပိုမိုကောင်းမွန်ရန် ပံ့ပိုးကူညီပေးရန်။"
+                                            },
+                                            {
+                                                "text": "မြန်မာ့လူ့အသိုင်းအဝိုင်းများအတွက် ပိုမိုကျန်းမာသော အစားအစာစနစ်တစ်ရပ် ဖြစ်ထွန်းလာစေရန် ပါဝင်ဆောင်ရွက်ရန်။"
+                                            },
+                                            {
+                                                "text": "ဒေသခံတောင်သူများအတွက် လက်တွေ့ကျသော ဖြေရှင်းချက်များ ဖန်တီးရန် ရုရှားစိုက်ပျိုးရေးနည်းပညာနှင့် မြန်မာ့စိုက်ပျိုးရေးအသိပညာတို့ကို ပေါင်းစပ်ပေးရန်။"
+                                            },
+                                            {
+                                                "text": "စိုက်ပျိုးရေးကဏ္ဍတစ်ခုလုံးတွင် ဘုံတန်ဖိုးများ ဖန်တီးရန် တောင်သူများ၊ စိုက်ပျိုးရေးပညာရှင်များ၊ စီးပွားရေးလုပ်ငန်းများနှင့် လူ့အသိုင်းအဝိုင်းတို့နှင့် ရေရှည်မိတ်ဖက်ဆက်ဆံရေးများ တည်ဆောက်ရန်။"
+                                            }
+                                        ]
                                     }
                                 ]
                             }
@@ -2293,11 +2389,40 @@
                         {
                             "type": "section",
                             "data": {
-                                "layout": "plain",
+                                "layout": "grid",
                                 "fields": [
                                     {
-                                        "type": "rich_text",
-                                        "value": "<h2>The Science Behind Our Success</h2><p>Our stimulants are powered by high-activity humic complexes enhanced with functional bio-additives that chemically bond with humic molecules. This innovation allows precise management of plant physiology, promoting faster germination and root growth, stronger stems and leaves, more abundant flowering and fruiting, and improved resilience against heat, drought, and disease stress.</p><p>Each liter contains 30–40 grams of active substances, yet its power lies not in nutrition but in bio-signaling — sending molecular messages that activate the plant’s hormonal and genetic systems.</p><p>At Ruma Organic we bring the most advanced Russian technology in humic and fulvic acid stimulants, derived from unique peat deposits found only in Russia — the richest source of natural bioactive substances on Earth.</p>"
+                                        "type": "title",
+                                        "value": "အဓိကတန်ဖိုးထားမှုများ"
+                                    },
+                                    {
+                                        "type": "list",
+                                        "items": [
+                                            {
+                                                "title": "တောင်သူကိုအဓိကထားခြင်း",
+                                                "text": "တောင်သူတွေရဲ့ လက်တွေ့ကျတဲ့လိုအပ်ချက်၊ အထွက်နှုန်း၊ ဝင်ငွေနဲ့ လူနေမှုဘဝတိုးတက်ရေးကို အဓိကထားဆောင်ရွက်ခြင်း။"
+                                            },
+                                            {
+                                                "title": "မြေဆီလွှာကျန်းမာရေး",
+                                                "text": "ကျန်းမာသောသီးနှံ၊ ပိုမိုကောင်းမွန်သောအစားအစာနဲ့ ရေရှည်တည်တံ့တဲ့ စိုက်ပျိုးရေးအတွက် ကျန်းမာတဲ့မြေဆီလွှာက အခြေခံအုတ်မြစ်ဖြစ်တယ်လို့ ယုံကြည်ခြင်း။"
+                                            },
+                                            {
+                                                "title": "အရည်အသွေးနှင့်ဂုဏ်သိက္ခာ",
+                                                "text": "အရည်အသွေးကောင်းမွန်သော ထုတ်ကုန်များ ပေးအပ်ခြင်း၊ စံချိန်စံညွှန်းများကို ထိန်းသိမ်းခြင်းနှင့် ရိုးသားတာဝန်ယူမှုရှိစွာ လုပ်ကိုင်ခြင်း။"
+                                            },
+                                            {
+                                                "title": "ဆန်းသစ်တီထွင်မှုနှင့်အသိပညာ",
+                                                "text": "နည်းပညာ၊ စိုက်ပျိုးရေးအသိပညာနဲ့ လက်တွေ့အတွေ့အကြုံတွေကို ပေါင်းစပ်ပြီး မြန်မာ့စိုက်ပျိုးရေး အတွက် ပိုမိုကောင်းမွန်တဲ့ ဖြေရှင်းချက်တွေ ဖော်ဆောင်ခြင်း။"
+                                            },
+                                            {
+                                                "title": "ရေရှည်တည်တံ့မှု",
+                                                "text": "လက်ရှိမျိုးဆက်သာမက နောင်လာနောက်သားများအတွက်ပါ မြေဆီလွှာ၊ သဘာဝအရင်းအမြစ်များနှင့် စိုက်ပျိုးထုတ်လုပ်နိုင်စွမ်းကို ထိန်းသိမ်းခြင်း။"
+                                            },
+                                            {
+                                                "title": "ပူးပေါင်းဆောင်ရွက်မှုနှင့်သာယာဝပြောတိုးတက်မှု",
+                                                "text": "တောင်သူ၊ စီးပွားရေးလုပ်ငန်းများ၊ စိုက်ပျိုးရေးပညာရှင်များနှင့် လူမှုအသိုင်းအဝိုင်းတို့ အတူတကွ တိုးတက်လာမှ စိုက်ပျိုးရေးကဏ္ဍလည်း ပိုမိုခိုင်မာလာမည်ဟု ယုံကြည်ခြင်း။"
+                                            }
+                                        ]
                                     }
                                 ]
                             }
@@ -2309,26 +2434,22 @@
                                 "fields": [
                                     {
                                         "type": "title",
-                                        "value": "ပေါင်းစပ်ခြင်း၏ အစွမ်းသတ္တိ"
+                                        "value": "ကျွန်ုပ်တို့၏ အဖွဲ့"
                                     },
                                     {
                                         "type": "list",
                                         "items": [
                                             {
-                                                "title": "ထုတ်လုပ်မှုစွမ်းအား ပိုမိုမြင့်မားခြင်း",
-                                                "text": "အထွက်နှုန်း +70% အထိ တိုးလာခြင်း — တစ်မျိုးချင်းစီ အသုံးပြုခြင်းထက် များစွာ သာလွန်သည်။"
+                                                "title": "Oleg",
+                                                "text": "RUMA Organic ဒါရိုက်တာ"
                                             },
                                             {
-                                                "title": "ရောဂါကို တိုက်ထုတ်နိုင်စွမ်းနှင့် ဖိစီးမှုကို ခံနိုင်ရည် ပိုမိုအားကောင်းခြင်း",
-                                                "text": "အပင်များသည် အပူချိန်ပြင်းထန်ခြင်း၊ ရေရှားခြင်း၊ ရေကြီးခြင်းနှင့် ရောဂါကျရောက်ခြင်းတို့ကို ပိုမိုကောင်းမွန်စွာ ခံနိုင်ရည်ရှိသည်။"
+                                                "title": "U Thurein Oo",
+                                                "text": "အထွေထွေမန်နေဂျာ"
                                             },
                                             {
-                                                "title": "ပိုးသတ်ဆေး သုံးစွဲမှုကို 30–50% အထိ လျှော့ချနိုင်ခြင်း",
-                                                "text": "ကျန်းမာသန်စွမ်းသော အပင်များသည် ရာသီတစ်လျှောက် ရောဂါကာကွယ်ရန် ဆေးဖျန်းရမှု ပိုမိုနည်းပါးသည်။"
-                                            },
-                                            {
-                                                "title": "ကျန်းမာသော မြေဆီလွှာ၊ ပို့ကုန်အဆင့်မီ သီးနှံများ",
-                                                "text": "ဇီဝပစ္စည်းများနှင့် ဟิူမစ်ဒြပ်ပေါင်းများသည် မြေဆီလွှာကို ဖြစ်ထွန်းစေပြီး သီးနှံအရည်အသွေးကို မြှင့်တင်ပေးသည်။"
+                                                "title": "Daw Khin Thida Nyein",
+                                                "text": "စီနီယာ ထုတ်ကုန်မန်နေဂျာ"
                                             }
                                         ]
                                     }
@@ -2341,8 +2462,19 @@
                                 "layout": "plain",
                                 "fields": [
                                     {
-                                        "type": "rich_text",
-                                        "value": "<h2>Why Ruma Technology Matters</h2><p>Our mission is not just to sell products — we transfer Russian scientific excellence into the heart of Southeast Asian agriculture. By localizing production in Nay Pyi Taw (opening 2026), we will make world-class bio-stimulants affordable and accessible for every Myanmar farmer. Ruma Organic — bridging science, soil, and sustainability.</p><h2>Plant and Showroom</h2><p>The Ruma Organic plant — built with Russian technology and Myanmar cooperation — will open in December 2026 with an annual capacity of 12 million liters. Affordable inputs for farmers: foliar stimulants around 15,000 MMK per acre and organic fertilizers around 5,000 MMK per liter.</p><p>Expected impact: +$2 billion export potential and +20% national yield increase — a project under the attention of both Russia and Myanmar leadership, driving sustainable economic growth and farmer prosperity.</p>"
+                                        "type": "title",
+                                        "value": "ကျွန်ုပ်တို့၏ မိတ်ဖက်များ"
+                                    },
+                                    {
+                                        "type": "list",
+                                        "items": [
+                                            {
+                                                "title": "NAS"
+                                            },
+                                            {
+                                                "title": "MSG"
+                                            }
+                                        ]
                                     }
                                 ]
                             }
@@ -2383,15 +2515,11 @@
                                 "fields": [
                                     {
                                         "type": "eyebrow",
-                                        "value": "Почему выбирают нас"
+                                        "value": "О нас"
                                     },
                                     {
                                         "type": "title",
-                                        "value": "Новая эра в растениеводстве"
-                                    },
-                                    {
-                                        "type": "paragraph",
-                                        "value": "Биологические активаторы, которые пробуждают природный генетический потенциал растения, а не обычные удобрения."
+                                        "value": "О RUMA Organic"
                                     },
                                     {
                                         "type": "globe",
@@ -2407,19 +2535,53 @@
                                 "fields": [
                                     {
                                         "type": "title",
-                                        "value": "Взгляд на вещи Ruma Organic"
-                                    },
-                                    {
-                                        "type": "profile",
-                                        "value": "Ruma Organic — это агротехнологическая компания, объединяющая российскую агрономию и полевые знания Мьянмы. Мы разрабатываем и поддерживаем практические программы питания растений для фермеров, дистрибьюторов и сельскохозяйственных партнеров."
+                                        "value": "Наша миссия и видение"
                                     },
                                     {
                                         "type": "mission",
-                                        "value": "Делать надежные сельскохозяйственные инновации понятными, применимыми и полезными для фермерских хозяйств, которые в них нуждаются."
+                                        "value": "Расширять возможности сельского хозяйства Мьянмы с помощью высококачественных семян, органических удобрений на основе гуминовых кислот и решений по восстановлению почвы, разработанных благодаря российско-мьянманскому сотрудничеству и сельскохозяйственной экспертизе."
                                     },
                                     {
                                         "type": "vision",
-                                        "value": "Более здоровые почвы, крепкие культуры и устойчивый агробизнес в каждом регионе присутствия."
+                                        "value": "Создать более здоровое и устойчивое сельское хозяйство, в котором фермеры процветают, люди имеют доступ к более здоровой пище, а плодородная почва сохраняется для будущих поколений."
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "type": "section",
+                            "data": {
+                                "layout": "plain",
+                                "fields": [
+                                    {
+                                        "type": "title",
+                                        "value": "Мы стремимся"
+                                    },
+                                    {
+                                        "type": "checklist",
+                                        "items": [
+                                            {
+                                                "text": "Улучшать здоровье почвы, восстанавливая необходимые питательные вещества и поддерживая здоровую почвенную среду."
+                                            },
+                                            {
+                                                "text": "Обеспечивать фермеров высококачественными семенами и эффективными решениями для повышения качества урожая, продуктивности и прибыльности."
+                                            },
+                                            {
+                                                "text": "Продвигать ответственные и устойчивые сельскохозяйственные практики, защищающие почву и природные ресурсы."
+                                            },
+                                            {
+                                                "text": "Помогать фермерам достигать лучших урожаев, лучших доходов и лучшего качества жизни."
+                                            },
+                                            {
+                                                "text": "Вносить вклад в более здоровую продовольственную систему для общин Мьянмы."
+                                            },
+                                            {
+                                                "text": "Объединять российские агротехнологии и мьянманские сельскохозяйственные знания для создания практичных решений для местных фермеров."
+                                            },
+                                            {
+                                                "text": "Строить долгосрочные партнерства с фермерами, специалистами, бизнесом и общинами, создавая общую ценность для всего сельскохозяйственного сектора."
+                                            }
+                                        ]
                                     }
                                 ]
                             }
@@ -2472,11 +2634,40 @@
                         {
                             "type": "section",
                             "data": {
-                                "layout": "plain",
+                                "layout": "grid",
                                 "fields": [
                                     {
-                                        "type": "rich_text",
-                                        "value": "<h2>Научные основы нашего успеха</h2><p>Наши стимуляторы созданы на основе высокоактивных гуминовых комплексов, усиленных функциональными биодобавками, которые химически связываются с гуминовыми молекулами. Эта инновация позволяет точно управлять физиологией растений, способствуя более быстрому прорастанию и росту корней, укреплению стеблей и листьев, более обильному цветению и плодоношению, а также повышению устойчивости к жаре, засухе и болезням.</p><p>Каждый литр содержит 30–40 граммов активных веществ, однако его сила заключается не в питании, а в биосигнализации — передаче молекулярных сигналов, которые активируют гормональные и генетические системы растения.</p><p>В Ruma Organic мы предлагаем самые передовые российские технологии в области стимуляторов на основе гуминовых и фульвовых кислот, получаемых из уникальных торфяных месторождений, найденных только в России — богатейшего источника природных биоактивных веществ на Земле.</p>"
+                                        "type": "title",
+                                        "value": "Наши ключевые ценности"
+                                    },
+                                    {
+                                        "type": "list",
+                                        "items": [
+                                            {
+                                                "title": "Фермер прежде всего",
+                                                "text": "Мы ставим фермеров в центр всего, что делаем, сосредотачиваясь на практических решениях, которые повышают продуктивность, прибыльность и качество жизни."
+                                            },
+                                            {
+                                                "title": "Здоровье почвы",
+                                                "text": "Мы верим, что здоровая почва — основа здоровых урожаев, здоровой пищи и устойчивого сельского хозяйства."
+                                            },
+                                            {
+                                                "title": "Качество и честность",
+                                                "text": "Мы стремимся поставлять надежную продукцию, поддерживать высокие стандарты и вести бизнес честно и ответственно."
+                                            },
+                                            {
+                                                "title": "Инновации и знания",
+                                                "text": "Мы соединяем сельскохозяйственные знания, технологии и практический опыт, чтобы создавать лучшие решения для сельского хозяйства Мьянмы."
+                                            },
+                                            {
+                                                "title": "Устойчивость",
+                                                "text": "Мы работаем, чтобы защитить почву, природные ресурсы и продуктивность сельского хозяйства ради нынешнего и будущих поколений."
+                                            },
+                                            {
+                                                "title": "Партнерство и общее процветание",
+                                                "text": "Мы верим, что сельское хозяйство становится сильнее, когда фермеры, бизнес, специалисты и общины растут вместе."
+                                            }
+                                        ]
                                     }
                                 ]
                             }
@@ -2488,26 +2679,22 @@
                                 "fields": [
                                     {
                                         "type": "title",
-                                        "value": "Сила синергии"
+                                        "value": "Наша команда"
                                     },
                                     {
                                         "type": "list",
                                         "items": [
                                             {
-                                                "title": "Более высокая продуктивность",
-                                                "text": "Рост урожайности до +70% — больше, чем сумма отдельных обработок."
+                                                "title": "Oleg",
+                                                "text": "Директор RUMA Organic"
                                             },
                                             {
-                                                "title": "Более сильный иммунитет и устойчивость к стрессам",
-                                                "text": "Растения лучше переносят жару, засуху, затопление и болезни."
+                                                "title": "U Thurein Oo",
+                                                "text": "Генеральный менеджер"
                                             },
                                             {
-                                                "title": "Снижение использования пестицидов на 30–50%",
-                                                "text": "Более здоровым растениям требуется меньше защитных обработок за сезон."
-                                            },
-                                            {
-                                                "title": "Здоровая почва, урожай экспортного качества",
-                                                "text": "Органические вещества и гуминовые соединения оздоравливают почву и улучшают качество урожая."
+                                                "title": "Daw Khin Thida Nyein",
+                                                "text": "Старший менеджер по продукции"
                                             }
                                         ]
                                     }
@@ -2520,8 +2707,19 @@
                                 "layout": "plain",
                                 "fields": [
                                     {
-                                        "type": "rich_text",
-                                        "value": "<h2>Почему технологии Ruma имеют значение</h2><p>Наша миссия — не просто продавать продукцию, а переносить достижения российской науки в сердце сельского хозяйства Юго-Восточной Азии. Локализуя производство в Нейпьидо (открытие в 2026 году), мы сделаем биостимуляторы мирового класса доступными и недорогими для каждого фермера Мьянмы. Ruma Organic — объединяя науку, почву и экологичность.</p><h2>Завод и выставочный зал</h2><p>Завод Ruma Organic, построенный на основе российских технологий при сотрудничестве с Мьянмой, откроется в декабре 2026 года с годовой мощностью 12 миллионов литров. Доступные средства для аграриев: листовые стимуляторы стоимостью около 15 000 MMK за акр и органические удобрения около 5 000 MMK за литр.</p><p>Ожидаемый эффект: потенциал экспорта на сумму +$2 млрд и рост национальной урожайности на +20% — проект находится под вниманием руководства России и Мьянмы, стимулируя устойчивый экономический рост и процветание фермеров.</p>"
+                                        "type": "title",
+                                        "value": "Наши партнёры"
+                                    },
+                                    {
+                                        "type": "list",
+                                        "items": [
+                                            {
+                                                "title": "NAS"
+                                            },
+                                            {
+                                                "title": "MSG"
+                                            }
+                                        ]
                                     }
                                 ]
                             }
@@ -2613,6 +2811,11 @@
                                     {
                                         "type": "paragraph",
                                         "value": "Share your crop, growth stage, and field challenge with our team."
+                                    },
+                                    {
+                                        "type": "button",
+                                        "value": "Contact us",
+                                        "url": "/contact"
                                     }
                                 ]
                             }
@@ -2625,18 +2828,6 @@
                     "excerpt": null,
                     "seo": null,
                     "blocks": [
-                        {
-                            "type": "section",
-                            "data": {
-                                "layout": "plain",
-                                "fields": [
-                                    {
-                                        "type": "rich_text",
-                                        "value": "ကျွန်ုပ်တို့၏ ထုတ်ကုန်များ - Ruma Organicကျွန်ုပ်တို့၏ ထုတ်ကုန်များSuper Nitroပိုမိုဖတ်ရှုရန်Humate Plusပိုမိုဖတ်ရှုရန်Profi S-Mg-Znပိုမိုဖတ်ရှုရန်Florataပိုမိုဖတ်ရှုရန်Super Boronပိုမိုဖတ်ရှုရန်"
-                                    }
-                                ]
-                            }
-                        },
                         {
                             "type": "section",
                             "data": {
@@ -2680,6 +2871,11 @@
                                     {
                                         "type": "paragraph",
                                         "value": "သင့်သီးနှံ၊ ကြီးထွားမှုအဆင့်နှင့် စိုက်ခင်းပြဿနာတို့ကို ကျွန်ုပ်တို့အဖွဲ့အား မျှဝေပါ။"
+                                    },
+                                    {
+                                        "type": "button",
+                                        "value": "ဆက်သွယ်ရန်",
+                                        "url": "/contact"
                                     }
                                 ]
                             }
@@ -2692,18 +2888,6 @@
                     "excerpt": null,
                     "seo": null,
                     "blocks": [
-                        {
-                            "type": "section",
-                            "data": {
-                                "layout": "plain",
-                                "fields": [
-                                    {
-                                        "type": "rich_text",
-                                        "value": "Наша продукция - Ruma OrganicНаша продукцияSuper NitroУзнать большеHumate PlusУзнать большеProfi S-Mg-ZnУзнать большеFlorataУзнать большеSuper BoronУзнать больше"
-                                    }
-                                ]
-                            }
-                        },
                         {
                             "type": "section",
                             "data": {
@@ -2747,6 +2931,11 @@
                                     {
                                         "type": "paragraph",
                                         "value": "Расскажите нашей команде о вашей культуре, стадии роста и проблеме на поле."
+                                    },
+                                    {
+                                        "type": "button",
+                                        "value": "Связаться с нами",
+                                        "url": "/contact"
                                     }
                                 ]
                             }
@@ -3635,18 +3824,6 @@
                         {
                             "type": "section",
                             "data": {
-                                "layout": "plain",
-                                "fields": [
-                                    {
-                                        "type": "rich_text",
-                                        "value": "From certified Russian seed varieties and Myanmar-made liquid organic fertilizers to structured water technology and patented compost production — Ruma Organic is building the next chapter of sustainable agriculture in Myanmar together with Russian scientists and partners."
-                                    }
-                                ]
-                            }
-                        },
-                        {
-                            "type": "section",
-                            "data": {
                                 "layout": "hero",
                                 "fields": [
                                     {
@@ -3708,18 +3885,6 @@
                         {
                             "type": "section",
                             "data": {
-                                "layout": "plain",
-                                "fields": [
-                                    {
-                                        "type": "rich_text",
-                                        "value": "<p>ရုရှားနိုင်ငံ၏ အတည်ပြုချက်ရရှိထားသော မျိုးစေ့မျိုးကွဲများ၊ မြန်မာနိုင်ငံတွင် ထုတ်လုပ်ထားသော အရည်ဇီဝအဆေးများ၊ ရေဖွဲ့စည်းပညာ (Structured Water) နှင့် မူပိုင်ခွင့်ရရှိထားသော ကွန်ပိုးထုတ်လုပ်မှုအထိ — Ruma Organic သည် ရုရှားသိပ္ပံပညာရှင်များနှင့် မိတ်ဖက်များနှင့်အတူ မြန်မာနိုင်ငံ၏ ရေရှည်တည်တံ့သော စိုက်ပျိုးရေး၏ နောက်တစ်အခန်းကို တည်ဆောက်နေပါသည်။</p>"
-                                    }
-                                ]
-                            }
-                        },
-                        {
-                            "type": "section",
-                            "data": {
                                 "layout": "hero",
                                 "fields": [
                                     {
@@ -3778,18 +3943,6 @@
                     "excerpt": null,
                     "seo": null,
                     "blocks": [
-                        {
-                            "type": "section",
-                            "data": {
-                                "layout": "plain",
-                                "fields": [
-                                    {
-                                        "type": "rich_text",
-                                        "value": "<p>От сертифицированных российских сортов семян и произведённых в Мьянме жидких органических удобрений до технологии структурированной воды и патентованного производства компоста — Ruma Organic вместе с российскими учёными и партнёрами строит новую главу устойчивого сельского хозяйства Мьянмы.</p>"
-                                    }
-                                ]
-                            }
-                        },
                         {
                             "type": "section",
                             "data": {
@@ -3866,18 +4019,6 @@
                         "description": "Farmer result slides and frequently asked questions from farmers about RUMA — real field evidence from Myanmar farms."
                     },
                     "blocks": [
-                        {
-                            "type": "section",
-                            "data": {
-                                "layout": "plain",
-                                "fields": [
-                                    {
-                                        "type": "rich_text",
-                                        "value": "Real results from real fields. Farmer trial records, yield comparisons and the questions farmers most often ask about using Ruma Organic products."
-                                    }
-                                ]
-                            }
-                        },
                         {
                             "type": "section",
                             "data": {
@@ -3961,18 +4102,6 @@
                         {
                             "type": "section",
                             "data": {
-                                "layout": "plain",
-                                "fields": [
-                                    {
-                                        "type": "rich_text",
-                                        "value": "<p>လယ်ကွက်အစစ်မှ ရလဒ်အစစ်များ။ တောင်သူများ၏ စမ်းသပ်မှုမှတ်တမ်းများ၊ အထွက်နှုန်း နှိုင်းယှဉ်ချက်များနှင့် Ruma Organic ထုတ်ကုန်များ အသုံးပြုရာတွင် တောင်သူများ အဖြစ်အများဆုံး မေးလေ့ရှိသည့် မေးခွန်းများ။</p>"
-                                    }
-                                ]
-                            }
-                        },
-                        {
-                            "type": "section",
-                            "data": {
                                 "layout": "hero",
                                 "fields": [
                                     {
@@ -4050,18 +4179,6 @@
                     "excerpt": "",
                     "seo": [],
                     "blocks": [
-                        {
-                            "type": "section",
-                            "data": {
-                                "layout": "plain",
-                                "fields": [
-                                    {
-                                        "type": "rich_text",
-                                        "value": "<p>Реальные результаты на реальных полях. Записи фермерских испытаний, сравнения урожайности и ответы на вопросы, которые фермеры чаще всего задают о применении препаратов Ruma Organic.</p>"
-                                    }
-                                ]
-                            }
-                        },
                         {
                             "type": "section",
                             "data": {
@@ -6376,7 +6493,8 @@
             "opens_new_tab": false,
             "labels": {
                 "en": "About Us",
-                "ru": "О нас"
+                "ru": "О нас",
+                "my": "ကျွန်ုပ်တို့အကြောင်း"
             }
         },
         {
@@ -6393,7 +6511,9 @@
             "is_active": true,
             "opens_new_tab": false,
             "labels": {
-                "en": "Products"
+                "en": "Products",
+                "my": "ထုတ်ကုန်များ",
+                "ru": "Продукция"
             }
         },
         {
@@ -6426,7 +6546,9 @@
             "is_active": true,
             "opens_new_tab": false,
             "labels": {
-                "en": "Resources"
+                "en": "Resources",
+                "my": "အရင်းအမြစ်များ",
+                "ru": "Ресурсы"
             }
         },
         {
@@ -6501,7 +6623,8 @@
             "opens_new_tab": false,
             "labels": {
                 "en": "About Us",
-                "ru": "О нас"
+                "ru": "О нас",
+                "my": "ကျွန်ုပ်တို့အကြောင်း"
             }
         },
         {
@@ -6534,7 +6657,9 @@
             "is_active": true,
             "opens_new_tab": false,
             "labels": {
-                "en": "Products"
+                "en": "Products",
+                "my": "ထုတ်ကုန်များ",
+                "ru": "Продукция"
             }
         },
         {
@@ -6548,7 +6673,9 @@
             "is_active": true,
             "opens_new_tab": false,
             "labels": {
-                "en": "Resources"
+                "en": "Resources",
+                "my": "အရင်းအမြစ်များ",
+                "ru": "Ресурсы"
             }
         },
         {

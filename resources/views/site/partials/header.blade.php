@@ -64,8 +64,8 @@
 
     <div class="mx-auto flex min-h-20 max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
         <a href="{{ locale_path('/') }}" wire:navigate class="flex items-center gap-2">
-            <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-lime-300/95 shadow-lg shadow-lime-500/10">
-                <x-site.icon name="leaf" class="h-7 w-7 text-stone-950" />
+            <span class="flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl bg-white shadow-lg shadow-lime-500/10">
+                <img src="/logo-mark.png" alt="" class="h-full w-full object-contain" width="48" height="48">
             </span>
             <span class="text-xl font-black tracking-wide text-white">{{ $siteName }}</span>
         </a>
